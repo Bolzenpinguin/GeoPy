@@ -87,8 +87,8 @@ if not os.path.exists(outputDirComp):
 # give the place in the array of the nmea string
 count = 0
 
-# check for enough NMEA data
-checkNMEA = False
+# check for enough NMEA data to write -> only imported for the print statement
+firstCheckNMEA = False
 
 
 def CalcGPSinEXIF(decimalDegrees):
@@ -138,12 +138,12 @@ for fileName in sorted(os.listdir('output_frames')):
             img.save(os.path.join(outputDirComp, fileName), exif=exifBytes)
         else:
             shutil.copy(imgPath, os.path.join(outputDirComp, fileName))
-            if checkNMEA == False:
+            if firstCheckNMEA == False:
                 endWrittenImage = fileName
                 checkNMEA = True
         count += 1
 
-if checkNMEA:
+if firstCheckNMEA:
     print(f"Metadat written up to image {endWrittenImage}")
 
 # ****************************************** clean up ******************************************
