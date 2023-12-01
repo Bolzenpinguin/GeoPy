@@ -5,6 +5,7 @@ import sys
 import cv2
 import piexif
 from PIL import Image
+from datetime import datetime, timedelta
 
 # ****************************************** preparation ******************************************
 
@@ -53,7 +54,6 @@ sortingNumber = 0
 # loop through the frames in the video
 while videoCap.isOpened():
     ret, frame = videoCap.read()
-
     if ret:
         frameCounter += 1
 
@@ -62,15 +62,16 @@ while videoCap.isOpened():
             frameFilename = os.path.join(outputDir, f'{sortingNumber:05d}.jpg')
             cv2.imwrite(frameFilename, frame)
             sortingNumber += 1
-
-    else:
-        break
-
-videoCap.release()
+        else:
+            break
+    videoCap.release()
 
 # ****************************************** extract the nmea Strings ******************************************
 
-# Array for all the lines in the NMEA FIle -> only read the $GPGGA lines
+"""
+    Array for all the lines in the NMEA FIle -> only read the $GPGGA lines
+    get also the timestamp
+"""
 arrayNMEAString = []
 
 with open(nmeaPath, 'r') as nmeaFile:
@@ -144,7 +145,7 @@ for fileName in sorted(os.listdir('output_frames')):
         count += 1
 
 if firstCheckNMEA:
-    print(f"Metadat written up to image {endWrittenImage}")
+    print(f"Metadata written up to image {endWrittenImage}")
 
 # ****************************************** clean up ******************************************
 
