@@ -5,7 +5,6 @@ import sys
 import cv2
 import piexif
 from PIL import Image
-from datetime import datetime, timedelta
 
 # ****************************************** preparation ******************************************
 
@@ -43,29 +42,27 @@ if not os.access(nmeaPath, os.R_OK):
 videoCap = cv2.VideoCapture(videoPath)
 
 # get Frame rate
-frameRate = videoCap.get(cv2.CAP_PROP_FPS)
+frameRate = int(videoCap.get(cv2.CAP_PROP_FPS))
+frameCounter = 0
+sortingNumber = 0
+
 
 # ****************************************** extract the frames ******************************************
-
-frameCounter = 0
-interval = int(frameRate)
-sortingNumber = 0
 
 # loop through the frames in the video
 while videoCap.isOpened():
     ret, frame = videoCap.read()
-    if ret:
-        frameCounter += 1
+    if not ret:
+        break
 
-        # if the frame counter is divisible by the interval, extract the frame
-        if frameCounter % interval == 0:
-            frameFilename = os.path.join(outputDir, f'{sortingNumber:05d}.jpg')
-            cv2.imwrite(frameFilename, frame)
-            sortingNumber += 1
-        else:
-            break
-    videoCap.release()
+    frameCounter += 1
+    # if the frame counter is divisible by the interval, extract the frame
+    if frameCounter % frameRate == 0:
+        frame_filename = os.path.join(outputDir, f'{sortingNumber:05d}.jpg')
+        cv2.imwrite(frame_filename, frame)
+        sortingNumber += 1
 
+videoCap.release()
 # ****************************************** extract the nmea Strings ******************************************
 
 """
