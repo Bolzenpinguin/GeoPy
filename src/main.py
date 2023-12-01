@@ -9,7 +9,7 @@ from PIL import Image
 # ****************************************** preparation ******************************************
 
 # set to False if you want to keep all images without Metadata
-cleanUp = False
+cleanUp = True
 
 # create the output directory if it doesn't already exist
 outputDir = 'output_frames'
@@ -87,6 +87,9 @@ if not os.path.exists(outputDirComp):
 # give the place in the array of the nmea string
 count = 0
 
+# check for enough NMEA data
+checkNMEA = False
+
 
 def CalcGPSinEXIF(decimalDegrees):
     """
@@ -111,27 +114,37 @@ def CalcGPSinEXIF(decimalDegrees):
 for fileName in sorted(os.listdir('output_frames')):
     if fileName.endswith('.jpg'):
         imgPath = os.path.join('output_frames', fileName)
-        exifDict = piexif.load(imgPath)
 
-        gpsLatRef = arrayNMEAString[count].split(',')[3]
-        gpsLongRef = arrayNMEAString[count].split(',')[5]
+        if count < len(arrayNMEAString):
+            exifDict = piexif.load(imgPath)
 
-        gpsLat = CalcGPSinEXIF(float(arrayNMEAString[count].split(',')[2]))
-        gpsLong = CalcGPSinEXIF(float(arrayNMEAString[count].split(',')[4]))
+            gpsLatRef = arrayNMEAString[count].split(',')[3]
+            gpsLongRef = arrayNMEAString[count].split(',')[5]
 
-        gpsIfd = {
-            piexif.GPSIFD.GPSLatitude: gpsLat,
-            piexif.GPSIFD.GPSLatitudeRef: gpsLatRef.encode(),
-            piexif.GPSIFD.GPSLongitude: gpsLong,
-            piexif.GPSIFD.GPSLongitudeRef: gpsLongRef.encode()
-        }
+            gpsLat = CalcGPSinEXIF(float(arrayNMEAString[count].split(',')[2]))
+            gpsLong = CalcGPSinEXIF(float(arrayNMEAString[count].split(',')[4]))
 
-        exifDict["GPS"] = gpsIfd
+            gpsIfd = {
+                piexif.GPSIFD.GPSLatitude: gpsLat,
+                piexif.GPSIFD.GPSLatitudeRef: gpsLatRef.encode(),
+                piexif.GPSIFD.GPSLongitude: gpsLong,
+                piexif.GPSIFD.GPSLongitudeRef: gpsLongRef.encode()
+            }
 
-        exifBytes = piexif.dump(exifDict)
-        img = Image.open(imgPath)
-        img.save(os.path.join(outputDirComp, fileName), exif=exifBytes)
+            exifDict["GPS"] = gpsIfd
+
+            exifBytes = piexif.dump(exifDict)
+            img = Image.open(imgPath)
+            img.save(os.path.join(outputDirComp, fileName), exif=exifBytes)
+        else:
+            shutil.copy(imgPath, os.path.join(outputDirComp, fileName))
+            if checkNMEA == False:
+                endWrittenImage = fileName
+                checkNMEA = True
         count += 1
+
+if checkNMEA:
+    print(f"Metadat written up to image {endWrittenImage}")
 
 # ****************************************** clean up ******************************************
 
