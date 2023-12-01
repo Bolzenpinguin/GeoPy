@@ -164,4 +164,5 @@ cython_debug/
 videoAndNMEASource/
 
 # Output
-outputJPGGPS/
+outputJPGGPS/*.jpg
+output_frames/*.jpg
