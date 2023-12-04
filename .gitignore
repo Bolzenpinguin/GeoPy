@@ -166,3 +166,6 @@ videoAndNMEASource/
 # Output
 src/outputJPGGPS/*.jpg
 src/output_frames/*.jpg
+
+# macOS DS_Store
+.DS_Store
