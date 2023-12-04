@@ -4,7 +4,9 @@ import os
 import sys
 import cv2
 import piexif
+import pytz
 from PIL import Image
+from datetime import datetime, timedelta
 
 # ****************************************** preparation ******************************************
 
@@ -47,6 +49,22 @@ frameCounter = 0
 sortingNumber = 0
 
 
+"""
+    Because NMEA is in UTC and in Germany its CEST I first have to look if its winter or summer time
+"""
+def IsSummerTime(timeZoneString):
+    timeZone = pytz.timezone(timeZoneString)
+    now = datetime.now(timeZone)
+    return now.dst() != timedelta(0)
+
+
+isSummer = IsSummerTime("Europe/Berlin")
+
+if isSummer == True:
+    plusUTC = 2
+else:
+    plusUTC = 1
+
 # ****************************************** extract the frames ******************************************
 
 # loop through the frames in the video
@@ -75,6 +93,7 @@ with open(nmeaPath, 'r') as nmeaFile:
     for line in nmeaFile:
         if line.startswith('$GPGGA'):
             arrayNMEAString.append(line.strip())
+            print(arrayNMEAString)
 
 # ****************************************** write the metadata ******************************************
 
