@@ -5,3 +5,5 @@ A Python program that splits a mp4 movie into frames and assigns the GPS data to
 argv0 = Path to the video
 
 argv1 = path to the nmea string
+
+argv2 = path to bool bit mask (what nmea lines you want to use)

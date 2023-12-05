@@ -22,23 +22,19 @@ videoPath = sys.argv[1]
 
 # check if video exits and if is readable
 if not os.path.exists(videoPath):
-    print(f"Video file '{videoPath}' does not exist.")
-    exit()
+    exit(f"Video file '{videoPath}' does not exist.")
 
 if not os.access(videoPath, os.R_OK):
-    print(f"Cannot read the video file '{videoPath}'.")
-    exit()
+    exit(f"Cannot read the video file '{videoPath}'.")
 
 nmeaPath = sys.argv[2]
 
 # check if nmea exits and if is readable
 if not os.path.exists(nmeaPath):
-    print(f"NMEA file '{nmeaPath}' does not exist.")
-    exit()
+    exit(f"NMEA file '{nmeaPath}' does not exist.")
 
 if not os.access(nmeaPath, os.R_OK):
-    print(f"Cannot read the NMEA file '{nmeaPath}' .")
-    exit()
+    exit(f"Cannot read the NMEA file '{nmeaPath}' .")
 
 # open the video file
 videoCap = cv2.VideoCapture(videoPath)
@@ -48,22 +44,14 @@ frameRate = int(videoCap.get(cv2.CAP_PROP_FPS))
 frameCounter = 0
 sortingNumber = 0
 
+bitMaskPath = sys.argv[3]
 
-"""
-    Because NMEA is in UTC and in Germany its CEST I first have to look if its winter or summer time
-"""
-def IsSummerTime(timeZoneString):
-    timeZone = pytz.timezone(timeZoneString)
-    now = datetime.now(timeZone)
-    return now.dst() != timedelta(0)
+# Check if bit mask file exists and is readable
+if not os.path.exists(bitMaskPath):
+    exit(f"Bit mask file '{bitMaskPath}' does not exist.")
 
-
-isSummer = IsSummerTime("Europe/Berlin")
-
-if isSummer == True:
-    plusUTC = 2
-else:
-    plusUTC = 1
+if not os.access(bitMaskPath, os.R_OK):
+    exit(f"Cannot read the bit mask file '{bitMaskPath}'.")
 
 # ****************************************** extract the frames ******************************************
 
@@ -83,17 +71,42 @@ while videoCap.isOpened():
 videoCap.release()
 # ****************************************** extract the nmea Strings ******************************************
 
-"""
-    Array for all the lines in the NMEA FIle -> only read the $GPGGA lines
-    get also the timestamp
-"""
-arrayNMEAString = []
-
+# Count the number of $GPGGA lines in the NMEA file
+gpggaCount = 0
 with open(nmeaPath, 'r') as nmeaFile:
     for line in nmeaFile:
         if line.startswith('$GPGGA'):
-            arrayNMEAString.append(line.strip())
-            print(arrayNMEAString)
+            gpggaCount += 1
+
+# Read and parse the bit mask
+with open(bitMaskPath, 'r') as bitMaskFile:
+    bitMaskString = bitMaskFile.read().strip()
+    bitMask = [bool(int(bit)) for bit in bitMaskString]
+
+originalBitMaskLength = len(bitMask)
+
+# Check if the lengths match
+if originalBitMaskLength != gpggaCount:
+    if originalBitMaskLength > gpggaCount:
+        bitMask = bitMask[:gpggaCount]
+        exit(f"Bit mask ({originalBitMaskLength}) is larger than $GPGGA lines ({gpggaCount})")
+    else:
+        exit(f"Bit mask ({originalBitMaskLength}) is shorter than the number of $GPGGA lines ({gpggaCount})")
+
+arrayNMEAString = []
+
+gpggaIndex = 0
+with open(nmeaPath, 'r') as nmeaFile:
+    for line in nmeaFile:
+        if line.startswith('$GPGGA'):
+            if gpggaIndex < len(bitMask):
+                if bitMask[gpggaIndex]:
+                    arrayNMEAString.append(line.strip())
+                else:
+                    # if the Bit Mask is 0 -> no value to the array
+                    arrayNMEAString.append(None)
+            gpggaIndex += 1
+
 
 # ****************************************** write the metadata ******************************************
 
@@ -133,26 +146,27 @@ for fileName in sorted(os.listdir('output_frames')):
         imgPath = os.path.join('output_frames', fileName)
 
         if count < len(arrayNMEAString):
-            exifDict = piexif.load(imgPath)
+            if arrayNMEAString[count] is not None:
+                exifDict = piexif.load(imgPath)
 
-            gpsLatRef = arrayNMEAString[count].split(',')[3]
-            gpsLongRef = arrayNMEAString[count].split(',')[5]
+                gpsLatRef = arrayNMEAString[count].split(',')[3]
+                gpsLongRef = arrayNMEAString[count].split(',')[5]
 
-            gpsLat = CalcGPSinEXIF(float(arrayNMEAString[count].split(',')[2]))
-            gpsLong = CalcGPSinEXIF(float(arrayNMEAString[count].split(',')[4]))
+                gpsLat = CalcGPSinEXIF(float(arrayNMEAString[count].split(',')[2]))
+                gpsLong = CalcGPSinEXIF(float(arrayNMEAString[count].split(',')[4]))
 
-            gpsIfd = {
-                piexif.GPSIFD.GPSLatitude: gpsLat,
-                piexif.GPSIFD.GPSLatitudeRef: gpsLatRef.encode(),
-                piexif.GPSIFD.GPSLongitude: gpsLong,
-                piexif.GPSIFD.GPSLongitudeRef: gpsLongRef.encode()
-            }
+                gpsIfd = {
+                    piexif.GPSIFD.GPSLatitude: gpsLat,
+                    piexif.GPSIFD.GPSLatitudeRef: gpsLatRef.encode(),
+                    piexif.GPSIFD.GPSLongitude: gpsLong,
+                    piexif.GPSIFD.GPSLongitudeRef: gpsLongRef.encode()
+                }
 
-            exifDict["GPS"] = gpsIfd
+                exifDict["GPS"] = gpsIfd
 
-            exifBytes = piexif.dump(exifDict)
-            img = Image.open(imgPath)
-            img.save(os.path.join(outputDirComp, fileName), exif=exifBytes)
+                exifBytes = piexif.dump(exifDict)
+                img = Image.open(imgPath)
+                img.save(os.path.join(outputDirComp, fileName), exif=exifBytes)
         else:
             shutil.copy(imgPath, os.path.join(outputDirComp, fileName))
             if firstCheckNMEA == False:
