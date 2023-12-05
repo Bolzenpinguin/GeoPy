@@ -164,9 +164,8 @@ cython_debug/
 videoAndNMEASource/
 
 # Output
-src/outputJPGGPS/*.jpg
-src/output_frames/*.jpg
+src/outputJPGGPS/
+src/output_frames/
 
 # macOS DS_Store
-.DS_Store
 .DS_Store
