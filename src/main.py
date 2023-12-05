@@ -88,7 +88,6 @@ originalBitMaskLength = len(bitMask)
 # Check if the lengths match
 if originalBitMaskLength != gpggaCount:
     if originalBitMaskLength > gpggaCount:
-        bitMask = bitMask[:gpggaCount]
         exit(f"Bit mask ({originalBitMaskLength}) is larger than $GPGGA lines ({gpggaCount})")
     else:
         exit(f"Bit mask ({originalBitMaskLength}) is shorter than the number of $GPGGA lines ({gpggaCount})")
@@ -146,6 +145,7 @@ for fileName in sorted(os.listdir('output_frames')):
         imgPath = os.path.join('output_frames', fileName)
 
         if count < len(arrayNMEAString):
+            # Check if the NMEA string is None -> (Bit Mask) else copy without Metadata
             if arrayNMEAString[count] is not None:
                 exifDict = piexif.load(imgPath)
 
@@ -167,12 +167,17 @@ for fileName in sorted(os.listdir('output_frames')):
                 exifBytes = piexif.dump(exifDict)
                 img = Image.open(imgPath)
                 img.save(os.path.join(outputDirComp, fileName), exif=exifBytes)
+            else:
+                # copy image without Metadata
+                shutil.copy(imgPath, os.path.join(outputDirComp, fileName))
+
+            count += 1
         else:
             shutil.copy(imgPath, os.path.join(outputDirComp, fileName))
-            if firstCheckNMEA == False:
+            if not firstCheckNMEA:
                 endWrittenImage = fileName
-                checkNMEA = True
-        count += 1
+                firstCheckNMEA = True
+            count += 1
 
 if firstCheckNMEA:
     print(f"Metadata written up to image {endWrittenImage}")
