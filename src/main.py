@@ -13,105 +13,173 @@ from datetime import datetime, timedelta
 # set to False if you want to keep all images without Metadata
 cleanUp = True
 
-# create the output directory if it doesn't already exist
+
+def CheckPathStartFiles(path):
+    """
+    :param path: Path as a String Value
+    """
+    if not os.path.exists(path):
+        exit(f"File in '{path}' dose not exist.")
+
+
+def ChekReadabllty(path):
+    """
+    :param path: Path as a String Value
+    """
+    if not os.access(path, os.R_OK):
+        exit(f"Cannot read the file '{path}' .")
+
+
+def CreateDir(name):
+    """
+    :param name: check if there is a folder, if not create one
+    """
+    if not os.path.exists(name):
+        os.makedirs(name)
+
+
+# create the directories if they don't already exist
 outputDir = 'output_frames'
-if not os.path.exists(outputDir):
-    os.makedirs(outputDir)
+CreateDir(outputDir)
+
+outputDirComp = 'outputJPGGPS'
+CreateDir(outputDirComp)
 
 videoPath = sys.argv[1]
 
 # check if video exits and if is readable
-if not os.path.exists(videoPath):
-    exit(f"Video file '{videoPath}' does not exist.")
-
-if not os.access(videoPath, os.R_OK):
-    exit(f"Cannot read the video file '{videoPath}'.")
+CheckPathStartFiles(videoPath)
+ChekReadabllty(videoPath)
 
 nmeaPath = sys.argv[2]
 
 # check if nmea exits and if is readable
-if not os.path.exists(nmeaPath):
-    exit(f"NMEA file '{nmeaPath}' does not exist.")
-
-if not os.access(nmeaPath, os.R_OK):
-    exit(f"Cannot read the NMEA file '{nmeaPath}' .")
+CheckPathStartFiles(nmeaPath)
+ChekReadabllty(nmeaPath)
 
 # open the video file
 videoCap = cv2.VideoCapture(videoPath)
 
 # get Frame rate
 frameRate = int(videoCap.get(cv2.CAP_PROP_FPS))
-frameCounter = 0
-sortingNumber = 0
 
 bitMaskPath = sys.argv[3]
 
 # Check if bit mask file exists and is readable
-if not os.path.exists(bitMaskPath):
-    exit(f"Bit mask file '{bitMaskPath}' does not exist.")
+CheckPathStartFiles(bitMaskPath)
+ChekReadabllty(bitMaskPath)
 
-if not os.access(bitMaskPath, os.R_OK):
-    exit(f"Cannot read the bit mask file '{bitMaskPath}'.")
 
 # ****************************************** extract the frames ******************************************
 
-# loop through the frames in the video
-while videoCap.isOpened():
-    ret, frame = videoCap.read()
-    if not ret:
-        break
+def ExtractFramesFromVideo(videoCap, frameRate, outputDir):
+    """
+    :param videoCap: open Video File
+    :param frameRate: from the open Video
+    :param outputDir: There the frames should be saved (temporally if you set cleanup True)
 
-    frameCounter += 1
-    # if the frame counter is divisible by the interval, extract the frame
-    if frameCounter % frameRate == 0:
-        frame_filename = os.path.join(outputDir, f'{sortingNumber:05d}.jpg')
-        cv2.imwrite(frame_filename, frame)
-        sortingNumber += 1
+    Loop through the frames in the video, if the frame counter is divisible by the interval, extracts the frame
+    """
+    frameCounter = 0
+    sortingNumber = 0
 
-videoCap.release()
+    while videoCap.isOpened():
+        ret, frame = videoCap.read()
+        if not ret:
+            break
+        frameCounter += 1
+        if frameCounter % frameRate == 0:
+            frame_filename = os.path.join(outputDir, f'{sortingNumber:05d}.jpg')
+            cv2.imwrite(frame_filename, frame)
+            sortingNumber += 1
+
+    videoCap.release()
+
+
+# Calling the function
+ExtractFramesFromVideo(videoCap, frameRate, outputDir)
+
+
 # ****************************************** extract the nmea Strings ******************************************
 
+def CountGPGGALines(nmeaPath):
+    """
+    :param nmeaPath: Path to the NMEA File as String
+    :return: number of lines as int
+    """
+    gpggaCount = 0
+    with open(nmeaPath, 'r') as nmeaFile:
+        for line in nmeaFile:
+            if line.startswith('$GPGGA'):
+                gpggaCount += 1
+    return gpggaCount
+
+
 # Count the number of $GPGGA lines in the NMEA file
-gpggaCount = 0
-with open(nmeaPath, 'r') as nmeaFile:
-    for line in nmeaFile:
-        if line.startswith('$GPGGA'):
-            gpggaCount += 1
+gpggaCount = CountGPGGALines(nmeaPath)
+
+
+def ReadAndParseBitMask(bitMaskPath):
+    """
+    :param bitMaskPath: Path to the Bit Mask as String
+    :return: the bit mask as array with bool values
+    with open -> File open and close if finish with reading ('r')
+    strip -> delete space in front or end of the bit mask
+    bitMask = [bool(int(bit)) for bit in bitMaskString] -> parse the integer as bool values
+    """
+    with open(bitMaskPath, 'r') as bitMaskFile:
+        bitMaskString = bitMaskFile.read().strip()
+        bitMask = [bool(int(bit)) for bit in bitMaskString]
+    return bitMask
+
 
 # Read and parse the bit mask
-with open(bitMaskPath, 'r') as bitMaskFile:
-    bitMaskString = bitMaskFile.read().strip()
-    bitMask = [bool(int(bit)) for bit in bitMaskString]
+bitMask = ReadAndParseBitMask(bitMaskPath)
 
-originalBitMaskLength = len(bitMask)
+
+def MatchBitMaskGPGGA(lengthBit, lengthGPGGA):
+    """
+    :param lengthBit: length from array bit mask as int
+    :param lengthGPGGA: int-counted lines from NMEA File
+    :return: if both have the same value no return and continue with code
+    """
+    if lengthBit != lengthGPGGA:
+        if lengthBit > lengthGPGGA:
+            exit(f"Bit mask ({lengthBit}) is larger than $GPGGA lines ({lengthGPGGA})")
+        else:
+            exit(f"Bit mask ({lengthBit}) is shorter than the number of $GPGGA lines ({lengthGPGGA})")
+
 
 # Check if the lengths match
-if originalBitMaskLength != gpggaCount:
-    if originalBitMaskLength > gpggaCount:
-        exit(f"Bit mask ({originalBitMaskLength}) is larger than $GPGGA lines ({gpggaCount})")
-    else:
-        exit(f"Bit mask ({originalBitMaskLength}) is shorter than the number of $GPGGA lines ({gpggaCount})")
+MatchBitMaskGPGGA(len(bitMask), gpggaCount)
 
-arrayNMEAString = []
 
-gpggaIndex = 0
-with open(nmeaPath, 'r') as nmeaFile:
-    for line in nmeaFile:
-        if line.startswith('$GPGGA'):
-            if gpggaIndex < len(bitMask):
-                if bitMask[gpggaIndex]:
-                    arrayNMEAString.append(line.strip())
-                else:
-                    # if the Bit Mask is 0 -> no value to the array
-                    arrayNMEAString.append(None)
-            gpggaIndex += 1
+def PrepareNMEAString(nmeaPath, bitMask):
+    """
+    :param nmeaPath: Path to the NMEA File as String
+    :param bitMask: bit Mask already converted into True and False
+    :return: THe array with the places that should not be included (False) declared as None -> no value
+    gpggaIndex is for comparison the place to the correct place in the bit mask
+    """
+    arrayNMEA = []
+    gpggaIndex = 0
 
+    with open(nmeaPath, 'r') as nmeaFile:
+        for line in nmeaFile:
+            if line.startswith('$GPGGA'):
+                if gpggaIndex < len(bitMask):
+                    if bitMask[gpggaIndex] == True:
+                        arrayNMEA.append(line.strip())
+                    else:
+                        arrayNMEA.append(None)
+                gpggaIndex += 1
+    return arrayNMEA
+
+
+# get the nmea Array with the mathing bit mask values
+arrayNMEAString = PrepareNMEAString(nmeaPath, bitMask)
 
 # ****************************************** write the metadata ******************************************
-
-outputDirComp = 'outputJPGGPS'
-if not os.path.exists(outputDirComp):
-    os.makedirs(outputDirComp)
 
 # give the place in the array of the nmea string
 count = 0
@@ -129,7 +197,7 @@ def CalcGPSinEXIF(decimalDegrees):
     seconds = int(0.449 * 60) = int(26.94) = 26
 
     return (67, 1), (24, 1), (26, 1)
-    -> The 1 mean that the value is finished -> (6700, 100) would be converted into 67
+    -> The 1 means that the value is finished -> (6700, 100) would be converted into 67
     """
     degrees = int(decimalDegrees / 100)
     minutes = int(decimalDegrees - (degrees * 100))
