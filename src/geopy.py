@@ -30,7 +30,7 @@ def CheckReadability(path):
 def CreateDir(name):
     """
     Create a directory if it not exists
-    :param name: Name of the directory
+    :param name: Name of the directory as String
     """
     if not os.path.exists(name):
         os.makedirs(name)
