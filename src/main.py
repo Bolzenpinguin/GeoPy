@@ -69,35 +69,45 @@ bitMaskPath = sys.argv[3]
 CheckPathStartFiles(bitMaskPath)
 ChekReadabllty(bitMaskPath)
 
+# start of the video frame
+videoStartFrame = int(sys.argv[4])
+
+# start of the nmea Line
+nmeaStartLine = int(sys.argv[5])
+
 
 # ****************************************** extract the frames ******************************************
 
-def ExtractFramesFromVideo(videoCap, frameRate, outputDir):
+def ExtractFramesFromVideo(videoCap, frameRate, outputDir, startFrame):
     """
     :param videoCap: open Video File
     :param frameRate: from the open Video
     :param outputDir: There the frames should be saved (temporally if you set cleanup True)
+    :param startFrame: int start position from the video -> 0 if you want to begin from start otherwise exact Frame (e.g. 724)
 
-    Loop through the frames in the video, if the frame counter is divisible by the interval, extracts the frame
+    Loop through the frames in the video,
+    if the frame counter is divisible by the interval, extracts the frame
     """
-    frameCounter = 0
+    frameCounter = startFrame
     sortingNumber = 0
+
+    videoCap.set(cv2.CAP_PROP_POS_FRAMES, startFrame)
 
     while videoCap.isOpened():
         ret, frame = videoCap.read()
         if not ret:
             break
-        frameCounter += 1
         if frameCounter % frameRate == 0:
-            frame_filename = os.path.join(outputDir, f'{sortingNumber:05d}.jpg')
-            cv2.imwrite(frame_filename, frame)
+            frameFilename = os.path.join(outputDir, f'{sortingNumber:05d}.jpg')
+            cv2.imwrite(frameFilename, frame)
             sortingNumber += 1
-
+        frameCounter += 1
+        #print(f"Frame: {frameCounter}")
     videoCap.release()
 
 
 # Calling the function
-ExtractFramesFromVideo(videoCap, frameRate, outputDir)
+ExtractFramesFromVideo(videoCap, frameRate, outputDir, videoStartFrame)
 
 
 # ****************************************** extract the nmea Strings ******************************************
@@ -152,30 +162,32 @@ def MatchBitMaskGPGGA(lengthBit, lengthGPGGA):
 MatchBitMaskGPGGA(len(bitMask), gpggaCount)
 
 
-def PrepareNMEAString(nmeaPath, bitMask):
+def PrepareNMEAString(nmeaPath, bitMask, nmeaStartLine):
     """
     :param nmeaPath: Path to the NMEA File as String
     :param bitMask: bit Mask already converted into True and False
-    :return: THe array with the places that should not be included (False) declared as None -> no value
+    :param nmeaStartLine: int start position from the NMEA file
+    :return: The array with the places that should not be included (False) declared as None -> no value
     gpggaIndex is for comparison the place to the correct place in the bit mask
     """
     arrayNMEA = []
     gpggaIndex = 0
 
     with open(nmeaPath, 'r') as nmeaFile:
-        for line in nmeaFile:
-            if line.startswith('$GPGGA'):
+        for index, line in enumerate(nmeaFile):
+            if line.startswith('$GPGGA') and index >= nmeaStartLine:
                 if gpggaIndex < len(bitMask):
-                    if bitMask[gpggaIndex] == True:
+                    if bitMask[gpggaIndex]:
                         arrayNMEA.append(line.strip())
                     else:
                         arrayNMEA.append(None)
                 gpggaIndex += 1
+                #print(f"NMEA line: {index}")
     return arrayNMEA
 
 
 # get the nmea Array with the mathing bit mask values
-arrayNMEAString = PrepareNMEAString(nmeaPath, bitMask)
+arrayNMEAString = PrepareNMEAString(nmeaPath, bitMask, nmeaStartLine)
 
 # ****************************************** write the metadata ******************************************
 
@@ -236,17 +248,15 @@ for fileName in sorted(os.listdir('output_frames')):
             else:
                 # copy image without Metadata
                 shutil.copy(imgPath, os.path.join(outputDirComp, fileName))
-
-            count += 1
         else:
             shutil.copy(imgPath, os.path.join(outputDirComp, fileName))
             if not firstCheckNMEA:
                 endWrittenImage = fileName
                 firstCheckNMEA = True
-            count += 1
+    count += 1
 
 if firstCheckNMEA:
-    print(f"Metadata written up to image {endWrittenImage}")
+    print(f"No Metadata written up Image: {endWrittenImage}")
 
 # ****************************************** clean up ******************************************
 
