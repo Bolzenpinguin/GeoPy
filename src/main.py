@@ -78,35 +78,34 @@ nmeaStartLine = int(sys.argv[5])
 
 # ****************************************** extract the frames ******************************************
 
-def ExtractFramesFromVideo(videoCap, frameRate, outputDir, startFrame):
+def ExtractFramesFromVideo(video, frameRate, outputDir, startFrame):
     """
-    :param videoCap: open Video File
+    :param video: open Video File
     :param frameRate: from the open Video
     :param outputDir: There the frames should be saved (temporally if you set cleanup True)
     :param startFrame: int start position from the video -> 0 if you want to begin from start otherwise exact Frame (e.g. 724)
 
-    Loop through the frames in the video,
+    Loop through the frames in the video, \n
     if the frame counter is divisible by the interval, extracts the frame
     """
     frameCounter = startFrame
-    sortingNumber = 0
+    frameSortingNumber = 0
 
-    videoCap.set(cv2.CAP_PROP_POS_FRAMES, startFrame)
+    video.set(cv2.CAP_PROP_POS_FRAMES, startFrame)
 
-    while videoCap.isOpened():
-        ret, frame = videoCap.read()
+    while video.isOpened():
+        ret, frame = video.read()
         if not ret:
             break
         if frameCounter % frameRate == 0:
-            frameFilename = os.path.join(outputDir, f'{sortingNumber:05d}.jpg')
+            frameFilename = os.path.join(outputDir, f'{frameSortingNumber:05d}.jpg')
             cv2.imwrite(frameFilename, frame)
-            sortingNumber += 1
+            frameSortingNumber += 1
         frameCounter += 1
         #print(f"Frame: {frameCounter}")
-    videoCap.release()
+    video.release()
 
 
-# Calling the function
 ExtractFramesFromVideo(videoCap, frameRate, outputDir, videoStartFrame)
 
 
@@ -132,9 +131,10 @@ gpggaCount = CountGPGGALines(nmeaPath)
 def ReadAndParseBitMask(bitMaskPath):
     """
     :param bitMaskPath: Path to the Bit Mask as String
-    :return: the bit mask as array with bool values
-    with open -> File open and close if finish with reading ('r')
-    strip -> delete space in front or end of the bit mask
+    :return: the bit mask as an array with bool values
+
+    with open -> File open and close if finish with reading ('r') \n
+    strip -> delete space in front or end of the bit mask \n
     bitMask = [bool(int(bit)) for bit in bitMaskString] -> parse the integer as bool values
     """
     with open(bitMaskPath, 'r') as bitMaskFile:
@@ -168,6 +168,7 @@ def PrepareNMEAString(nmeaPath, bitMask, nmeaStartLine):
     :param bitMask: bit Mask already converted into True and False
     :param nmeaStartLine: int start position from the NMEA file
     :return: The array with the places that should not be included (False) declared as None -> no value
+
     gpggaIndex is for comparison the place to the correct place in the bit mask
     """
     arrayNMEA = []
@@ -200,13 +201,13 @@ firstCheckNMEA = False
 
 def CalcGPSinEXIF(decimalDegrees):
     """
-    example: 6724.449
-    degrees = int(6724.449 / 100) = 67
-    minutes = int(6724.449 - (67 * 100)) = int(6724.449 - 6700) = int(24.449) = 24
-    decimalMinutes = 6724.449 - (67 * 100) - 24 = 24.449 - 24 = 0.449
-    seconds = int(0.449 * 60) = int(26.94) = 26
+    example: 6724.449 \n
+    degrees = int(6724.449 / 100) = 67 \n
+    minutes = int(6724.449 - (67 * 100)) = int(6724.449 - 6700) = int(24.449) = 24 \n
+    decimalMinutes = 6724.449 - (67 * 100) - 24 = 24.449 - 24 = 0.449 \n
+    seconds = int(0.449 * 60) = int(26.94) = 26 \n
 
-    return (67, 1), (24, 1), (26, 1)
+    return (67, 1), (24, 1), (26, 1) \n
     -> The 1 means that the value is finished -> (6700, 100) would be converted into 67
     """
     degrees = int(decimalDegrees / 100)
