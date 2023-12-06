@@ -4,7 +4,6 @@ import pytest
 from src.geopy import *
 
 
-
 def test_WriteMetadataToImage():
     # TODO ----------------------------------------------------
     pass
@@ -13,6 +12,7 @@ def test_WriteMetadataToImage():
 def test_ProcessVideoAndNMEA():
     # TODO ----------------------------------------------------
     pass
+
 
 def test_ExtractFramesFromVideo():
     sampleVideoPath = 'sample24Frames16Seconds.mp4'
@@ -72,112 +72,99 @@ def test_ExtractGPSDataFromNMEAString():
     assert lat == expectedLat, "Latitude value missmatch"
     assert long == expectedLong, "Longitude value missmatch"
 
-def test_CheckPathStartFiles():
-    # path exists
-    existingPath = '.'  # -> current Directory
-    try:
-        CheckPathStartFiles(existingPath)
-    except FileNotFoundError:
-        pytest.fail(f"Unexpected FileNotFoundError for path: {existingPath}")
 
-    # path doesn't exit
-    nonExistingPath = 'random/Path'
-    with pytest.raises(FileNotFoundError):
-        CheckPathStartFiles(nonExistingPath)
+def test_CheckPathStartFiles():
+    with tempfile.TemporaryDirectory() as tempDir:
+        # temporary directory
+        existingPath = tempDir
+        try:
+            CheckPathStartFiles(existingPath)
+        except FileNotFoundError:
+            pytest.fail(f"Unexpected FileNotFoundError for path: {existingPath}")
+
+        # Non-existing path
+        nonExistingPath = 'random/Path'
+        with pytest.raises(FileNotFoundError):
+            CheckPathStartFiles(nonExistingPath)
 
 
 def test_CheckReadability():
-    # path readable
-    readablePath = '.'  # -> current Directory -> definitely readable
-    try:
-        CheckReadability(readablePath)
-    except PermissionError:
-        pytest.fail(f"Unexpected PermissionError for path: {readablePath}")
+    with tempfile.NamedTemporaryFile(delete=False) as tempFile:
+        readablePath = tempFile.name
+        try:
+            CheckReadability(readablePath)
+        except PermissionError:
+            pytest.fail(f"Unexpected PermissionError for path: {readablePath}")
 
-    # path not readable
-    nonReadablePath = 'testNonReadable.txt'
-    try:
-        # create the non-readable file
+        # Non-readable path scenario remains the same
+        nonReadablePath = 'testNonReadable.txt'
         with open(nonReadablePath, 'w'):
             os.chmod(nonReadablePath, 0o000)
-
-        with pytest.raises(PermissionError):
-            CheckReadability(nonReadablePath)
-    finally:
-        # delete test file
-        os.remove(nonReadablePath)
+        try:
+            with pytest.raises(PermissionError):
+                CheckReadability(nonReadablePath)
+        finally:
+            os.remove(nonReadablePath)
 
 
 def test_CreateDir():
-    nameDri = 'testDir'
-    try:
-        assert CreateDir(nameDri) is True, "CreateDir did not return True"
-
-        assert os.path.isdir(nameDri), "Directory wasn't created"
-    finally:
-        if os.path.exists(nameDri):
-            os.rmdir(nameDri)  # remove testdir
+    with tempfile.TemporaryDirectory() as tempDir:
+        nameDir = os.path.join(tempDir, 'testDir')
+        assert CreateDir(nameDir) is True, "CreateDir did not return True"
+        assert os.path.isdir(nameDir), "Directory wasn't created"
 
 
 def test_CountGPGGALines():
-    testNMEAFile = 'testNMEAFile.nmea'
-    expectedCount = 3
-
-    with open(testNMEAFile, 'w') as file:
-        file.write('$GPGGA, line 1\n')
-        file.write('Test line \n')
-        file.write('$GPGGA, line 2\n')
-        file.write('$GPGGA, line 3\n')
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as tempNMEAFile:
+        tempNMEAFilePath = tempNMEAFile.name
+        tempNMEAFile.write('$GPGGA, line 1\n'
+                           'Test line \n'
+                           '$GPGGA, line 2\n'
+                           '$GPGGA, line 3\n')
 
     try:
-        actualCount = CountGPGGALines(testNMEAFile)
+        actualCount = CountGPGGALines(tempNMEAFilePath)
+        expectedCount = 3
         assert actualCount == expectedCount, f"Expected {expectedCount} but got {actualCount}"
     finally:
-        # Cleanup
-        os.remove(testNMEAFile)
+        os.remove(tempNMEAFilePath)
 
 
 def test_ReadAndParseBitMask():
-    testBitMaskFile = 'testBitMask.txt'
-    expectedBitMask = [True, False, True, True]
-
-    with open(testBitMaskFile, 'w') as file:
-        file.write('1011')
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as tempBitMaskFile:
+        tempBitMaskFilePath = tempBitMaskFile.name
+        tempBitMaskFile.write('1011')
 
     try:
-        actualBitMask = ReadAndParseBitMask(testBitMaskFile)
+        actualBitMask = ReadAndParseBitMask(tempBitMaskFilePath)
+        expectedBitMask = [True, False, True, True]
         assert actualBitMask == expectedBitMask, f"Expected {expectedBitMask} but got {actualBitMask}"
     finally:
-        # cleanup
-        os.remove(testBitMaskFile)
+        os.remove(tempBitMaskFilePath)
 
 
 def test_MatchBitMaskGPGGA():
     lengthBit = 5
-    lengthGPGPU = 5
-
-    # if they are equal
+    lengthGPGGA = 5
     try:
-        MatchBitMaskGPGGA(lengthBit, lengthGPGPU)
+        MatchBitMaskGPGGA(lengthBit, lengthGPGGA)
     except SystemExit:
         pytest.fail("Unexpected exit")
 
-    # if they are not equal
     lengthBit = 4
-    lengthGPGPU = 5
+    lengthGPGGA = 5
     with pytest.raises(SystemExit):
-        MatchBitMaskGPGGA(lengthBit, lengthGPGPU)
+        MatchBitMaskGPGGA(lengthBit, lengthGPGGA)
 
 
 def test_CalcGPSinEXIF():
     example = 6724.449
 
+    testDecimalDegree = CalcGPSinEXIF(example)
     degrees = int(example / 100)
     minutes = int(example - (degrees * 100))
     decimalMinutes = example - (degrees * 100) - minutes
     seconds = int(decimalMinutes * 60)
+    expectedDecimalDegree = (degrees, 1), (minutes, 1), (seconds, 1)
 
-    testDecimalDegree = (degrees, 1), (minutes, 1), (seconds, 1)
-    actualDecimalDegree = CalcGPSinEXIF(example)
-
-    assert actualDecimalDegree == testDecimalDegree, f"Expected {testDecimalDegree} but got {actualDecimalDegree}"
+    assert testDecimalDegree == expectedDecimalDegree, f"Expected {expectedDecimalDegree} but got {testDecimalDegree}"
