@@ -141,12 +141,10 @@ def MatchBitMaskGPGGA(lengthBit, lengthGPGGA):
     """
     :param lengthBit: length from array bit mask as int
     :param lengthGPGGA: int-counted lines from NMEA File
-    :return: if both have the same value no return and continue with code
+    :return: only throw the error if the bit mask is shorter than the gpgga file
     """
     if lengthBit != lengthGPGGA:
-        if lengthBit > lengthGPGGA:
-            exit(f"Bit mask ({lengthBit}) is larger than $GPGGA lines ({lengthGPGGA})")
-        else:
+        if lengthBit < lengthGPGGA:
             exit(f"Bit mask ({lengthBit}) is shorter than the number of $GPGGA lines ({lengthGPGGA})")
 
 
