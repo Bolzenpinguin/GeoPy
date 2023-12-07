@@ -249,9 +249,9 @@ def ProcessVideoAndNMEA(videoPathGiven, nmeaPathGiven, bitMaskPathGiven, videoSt
 # ************************************ Main Script *********************************
 if __name__ == "__main__":
 
-    # Check for command-line arguments
+    # Check for arguments
     if len(sys.argv) < 6:
-        sys.exit("Usage: script.py [videoPath] [nmeaPath] [bitMaskPath] [videoStartFrame] [nmeaStartLine]")
+        sys.exit("Usage: geopy.py [videoPath] [nmeaPath] [bitMaskPath] [videoStartFrame] [nmeaStartLine]")
 
     videoPath = sys.argv[1]
     nmeaPath = sys.argv[2]
