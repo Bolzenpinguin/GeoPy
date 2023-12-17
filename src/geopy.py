@@ -9,114 +9,114 @@ from PIL import Image
 
 # ************************************ Function Definitions *********************************
 
-def CheckPathStartFiles(path):
+def CheckPathStartFiles(pathFunc):
     """
     Checks if the given path exists
-    :param path: Path as a String Value
+    :param pathFunc: Path as a String Value
     """
-    if not os.path.exists(path):
-        raise FileNotFoundError(f"File in '{path}' does not exist.")
+    if not os.path.exists(pathFunc):
+        raise FileNotFoundError(f"File in '{pathFunc}' does not exist.")
 
 
-def CheckReadability(path):
+def CheckReadability(pathFunc):
     """
     Checks if the given path is readable
-    :param path: Path as a String Value
+    :param pathFunc: Path as a String Value
     """
-    if not os.access(path, os.R_OK):
-        raise PermissionError(f"Cannot read the file '{path}'.")
+    if not os.access(pathFunc, os.R_OK):
+        raise PermissionError(f"Cannot read the file '{pathFunc}'.")
 
 
-def CreateDir(name):
+def CreateDir(nameFunc):
     """
     Create a directory if it not exists
-    :param name: Name of the directory as String
+    :param nameFunc: Name of the directory as String
     """
-    if not os.path.exists(name):
-        os.makedirs(name)
-    return os.path.isdir(name)
+    if not os.path.exists(nameFunc):
+        os.makedirs(nameFunc)
+    return os.path.isdir(nameFunc)
 
 
-def ExtractFramesFromVideo(video, frameRate, outputDir, startFrame):
+def ExtractFramesFromVideo(videoFunc, frameRateFunc, outputDirFunc, startFrameFunc):
     """
     Extracts frames from the video file.
-    :param video: Open Video File
-    :param frameRate: Frame rate of the video
-    :param outputDir: Directory to save frames
-    :param startFrame: Starting frame position in the video
+    :param videoFunc: Open Video File
+    :param frameRateFunc: Frame rate of the video
+    :param outputDirFunc: Directory to save frames
+    :param startFrameFunc: Starting frame position in the video
     """
-    frameCounter = startFrame
+    frameCounter = startFrameFunc
     frameSortingNumber = 0
 
-    video.set(cv2.CAP_PROP_POS_FRAMES, startFrame)
+    videoFunc.set(cv2.CAP_PROP_POS_FRAMES, startFrameFunc)
 
-    while video.isOpened():
-        success, frame = video.read()
+    while videoFunc.isOpened():
+        success, frame = videoFunc.read()
         if not success:
             break
-        if frameCounter % frameRate == 0:
-            frameFilename = os.path.join(outputDir, f'{frameSortingNumber:05d}.jpg')
+        if frameCounter % frameRateFunc == 0:
+            frameFilename = os.path.join(outputDirFunc, f'{frameSortingNumber:05d}.jpg')
             cv2.imwrite(frameFilename, frame)
             frameSortingNumber += 1
         frameCounter += 1
         # print(f"Frame: {frameCounter}")
-    video.release()
+    videoFunc.release()
 
 
-def CountGPGGALines(nmeaPathCounting):
+def CountGPGGALines(nmeaPathCountingFunc):
     """
     Counts the number of GPGGA lines in the NMEA file
-    :param nmeaPathCounting: Path to the NMEA File
+    :param nmeaPathCountingFunc: Path to the NMEA File
     :return: Number of GPGGA lines
     """
     gpggaCount = 0
-    with open(nmeaPathCounting, 'r') as nmeaFile:
+    with open(nmeaPathCountingFunc, 'r') as nmeaFile:
         for line in nmeaFile:
             if line.startswith('$GPGGA'):
                 gpggaCount += 1
     return gpggaCount
 
 
-def ReadAndParseBitMask(bitMaskPathReadAndParse):
+def ReadAndParseBitMask(bitMaskPathReadAndParseFunc):
     """
     Reads and parses the bit mask file as boolean in an array
-    :param bitMaskPathReadAndParse: Path to the Bit Mask File
+    :param bitMaskPathReadAndParseFunc: Path to the Bit Mask File
     :return: Bit mask array
     """
-    with open(bitMaskPathReadAndParse, 'r') as bitMaskFile:
+    with open(bitMaskPathReadAndParseFunc, 'r') as bitMaskFile:
         bitMaskString = bitMaskFile.read().strip()
         bitMask = [bool(int(bit)) for bit in bitMaskString]
     return bitMask
 
 
-def MatchBitMaskGPGGA(lengthBit, lengthGPGGA):
+def MatchBitMaskGPGGA(lengthBitFunc, lengthGPGGAFunc):
     """
     Compares the length of bit mask with the number of GPGGA lines
-    :param lengthBit: Length of the bit mask
-    :param lengthGPGGA: Number of GPGGA lines
+    :param lengthBitFunc: Length of the bit mask
+    :param lengthGPGGAFunc: Number of GPGGA lines
     """
-    if lengthBit != lengthGPGGA:
-        if lengthBit < lengthGPGGA:
-            exit(f"Bit mask ({lengthBit}) is shorter than the number of $GPGGA lines ({lengthGPGGA})")
+    if lengthBitFunc != lengthGPGGAFunc:
+        if lengthBitFunc < lengthGPGGAFunc:
+            exit(f"Bit mask ({lengthBitFunc}) is shorter than the number of $GPGGA lines ({lengthGPGGAFunc})")
 
 
-def PrepareNMEAString(nmeaPathPreparing, bitMaskPreparing, nmeaStartLinePreparing):
+def PrepareNMEAString(nmeaPathPreparingFunc, bitMaskPreparingFunc, nmeaStartLinePreparingFunc):
     """
     Prepares the NMEA string based on the bit mask, positions with False get set to None
-    :param nmeaPathPreparing: Path to the NMEA File
-    :param bitMaskPreparing: Bit Mask array
-    :param nmeaStartLinePreparing: Starting line of the NMEA data
+    :param nmeaPathPreparingFunc: Path to the NMEA File
+    :param bitMaskPreparingFunc: Bit Mask array
+    :param nmeaStartLinePreparingFunc: Starting line of the NMEA data
     :return: Array of NMEA strings
     """
 
     arrayNMEA = []
     gpggaIndex = 0
 
-    with open(nmeaPathPreparing, 'r') as nmeaFile:
+    with open(nmeaPathPreparingFunc, 'r') as nmeaFile:
         for index, line in enumerate(nmeaFile):
-            if line.startswith('$GPGGA') and index >= nmeaStartLinePreparing:
-                if gpggaIndex < len(bitMaskPreparing):
-                    if bitMaskPreparing[gpggaIndex]:
+            if line.startswith('$GPGGA') and index >= nmeaStartLinePreparingFunc:
+                if gpggaIndex < len(bitMaskPreparingFunc):
+                    if bitMaskPreparingFunc[gpggaIndex]:
                         arrayNMEA.append(line.strip())
                     else:
                         arrayNMEA.append(None)
@@ -125,9 +125,9 @@ def PrepareNMEAString(nmeaPathPreparing, bitMaskPreparing, nmeaStartLinePreparin
     return arrayNMEA
 
 
-def CalcGPSinEXIF(decimalDegrees):
+def CalcGPSinEXIF(decimalDegreesFunc):
     """
-    :param decimalDegrees: Decimal degree value
+    :param decimalDegreesFunc: Decimal degree value
     :return: GPS data in EXIF format
 
     example: 6724.449 \n
@@ -139,47 +139,47 @@ def CalcGPSinEXIF(decimalDegrees):
     return (67, 1), (24, 1), (26, 1) \n
     -> The 1 means that the value is finished -> (6700, 100) would be converted into 67
     """
-    degrees = int(decimalDegrees / 100)
-    minutes = int(decimalDegrees - (degrees * 100))
-    decimalMinutes = decimalDegrees - (degrees * 100) - minutes
+    degrees = int(decimalDegreesFunc / 100)
+    minutes = int(decimalDegreesFunc - (degrees * 100))
+    decimalMinutes = decimalDegreesFunc - (degrees * 100) - minutes
     seconds = int(decimalMinutes * 60)
 
     return (degrees, 1), (minutes, 1), (seconds, 1)
 
 
-def ExtractGPSDataFromNMEAString(nmeaString):
+def ExtractGPSDataFromNMEAString(nmeaStringFunc):
     """
     Extracts GPS data from NMEA string
-    :param nmeaString: A single NMEA string
+    :param nmeaStringFunc: A single NMEA string
     :return: Tuple containing GPS latitude reference, longitude reference, latitude, and longitude.
     """
-    gpsLatRef = nmeaString.split(',')[3]
-    gpsLongRef = nmeaString.split(',')[5]
-    gpsLat = CalcGPSinEXIF(float(nmeaString.split(',')[2]))
-    gpsLong = CalcGPSinEXIF(float(nmeaString.split(',')[4]))
+    gpsLatRef = nmeaStringFunc.split(',')[3]
+    gpsLongRef = nmeaStringFunc.split(',')[5]
+    gpsLat = CalcGPSinEXIF(float(nmeaStringFunc.split(',')[2]))
+    gpsLong = CalcGPSinEXIF(float(nmeaStringFunc.split(',')[4]))
     return gpsLatRef, gpsLongRef, gpsLat, gpsLong
 
 
-def WriteMetadataToImage(outputFramesDir, arrayNMEAString, outputDirComp):
+def WriteMetadataToImage(outputFramesDirFunc, arrayNMEAStringFunc, outputDirCompFunc):
     """
     Writes metadata to images based on the NMEA string
-    :param outputFramesDir: Directory containing the frame images.
-    :param arrayNMEAString: Array of NMEA strings corresponding to each image.
-    :param outputDirComp: Directory where the processed images will be saved.
+    :param outputFramesDirFunc: Directory containing the frame images.
+    :param arrayNMEAStringFunc: Array of NMEA strings corresponding to each image.
+    :param outputDirCompFunc: Directory where the processed images will be saved.
     """
     count = 0
     firstCheckNMEA = False
     endWrittenImage = None
 
     # Iterate through sorted images and write metadata
-    for fileName in sorted(os.listdir(outputFramesDir)):
+    for fileName in sorted(os.listdir(outputFramesDirFunc)):
         if fileName.endswith('.jpg'):
-            imgPath = os.path.join(outputFramesDir, fileName)
+            imgPath = os.path.join(outputFramesDirFunc, fileName)
 
-            if count < len(arrayNMEAString):
-                if arrayNMEAString[count] is not None:
+            if count < len(arrayNMEAStringFunc):
+                if arrayNMEAStringFunc[count] is not None:
                     exifDict = piexif.load(imgPath)
-                    gpsLatRef, gpsLongRef, gpsLat, gpsLong = ExtractGPSDataFromNMEAString(arrayNMEAString[count])
+                    gpsLatRef, gpsLongRef, gpsLat, gpsLong = ExtractGPSDataFromNMEAString(arrayNMEAStringFunc[count])
 
                     gpsIfd = {
                         piexif.GPSIFD.GPSLatitude: gpsLat,
@@ -191,11 +191,11 @@ def WriteMetadataToImage(outputFramesDir, arrayNMEAString, outputDirComp):
                     exifDict["GPS"] = gpsIfd
                     exifBytes = piexif.dump(exifDict)
                     img = Image.open(imgPath)
-                    img.save(os.path.join(outputDirComp, fileName), exif=exifBytes)
+                    img.save(os.path.join(outputDirCompFunc, fileName), exif=exifBytes)
                 else:
-                    shutil.copy(imgPath, os.path.join(outputDirComp, fileName))
+                    shutil.copy(imgPath, os.path.join(outputDirCompFunc, fileName))
             else:
-                shutil.copy(imgPath, os.path.join(outputDirComp, fileName))
+                shutil.copy(imgPath, os.path.join(outputDirCompFunc, fileName))
                 if not firstCheckNMEA:
                     endWrittenImage = fileName
                     firstCheckNMEA = True
