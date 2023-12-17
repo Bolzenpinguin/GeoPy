@@ -170,8 +170,3 @@ src/output_frames/
 # macOS DS_Store
 .DS_Store
 
-# tests
-src/sample24Frames16Seconds.mp4
-src/test_geopy.py
-src/noMetadataImg.jpg
-src/testNMEA.nmea
