@@ -121,7 +121,7 @@ def PrepareNMEAString(nmeaPathPreparing, bitMaskPreparing, nmeaStartLinePreparin
                     else:
                         arrayNMEA.append(None)
                 gpggaIndex += 1
-                # print(f"NMEA line: {index}")
+
     return arrayNMEA
 
 
@@ -205,52 +205,11 @@ def WriteMetadataToImage(outputFramesDir, arrayNMEAString, outputDirComp):
         print(f"No Metadata written up Image: {endWrittenImage}")
 
 
-def ProcessVideoAndNMEA(videoPathGiven, nmeaPathGiven, bitMaskPathGiven, videoStartFrameGiven, nmeaStartLineGiven,
-                        cleanUpGiven):
-    """
-    Main processing function for video and NMEA data
-    :param videoPathGiven: Path to the video file
-    :param nmeaPathGiven: Path to the NMEA file
-    :param bitMaskPathGiven: Path to the Bit Mask file
-    :param videoStartFrameGiven: Start frame of video
-    :param nmeaStartLineGiven: Start line of NMEA data
-    :param cleanUpGiven: Boolean removes images without metadat
-    """
-    outputDir = 'output_frames'
-    CreateDir(outputDir)
-
-    outputDirComp = 'outputJPGGPS'
-    CreateDir(outputDirComp)
-
-    CheckPathStartFiles(videoPathGiven)
-    CheckReadability(videoPathGiven)
-
-    videoCap = cv2.VideoCapture(videoPathGiven)
-    frameRate = int(videoCap.get(cv2.CAP_PROP_FPS))
-    ExtractFramesFromVideo(videoCap, frameRate, outputDir, videoStartFrameGiven)
-
-    CheckPathStartFiles(nmeaPathGiven)
-    CheckReadability(nmeaPathGiven)
-    gpggaCount = CountGPGGALines(nmeaPathGiven)
-
-    CheckPathStartFiles(bitMaskPathGiven)
-    CheckReadability(bitMaskPathGiven)
-    bitMask = ReadAndParseBitMask(bitMaskPathGiven)
-
-    MatchBitMaskGPGGA(len(bitMask), gpggaCount)
-    arrayNMEAString = PrepareNMEAString(nmeaPathGiven, bitMask, nmeaStartLineGiven)
-
-    WriteMetadataToImage(outputDir, arrayNMEAString, outputDirComp)
-
-    if cleanUpGiven:
-        shutil.rmtree(outputDir)
-
-
 # ************************************ Main Script *********************************
 if __name__ == "__main__":
 
     # Check for arguments
-    if len(sys.argv) < 6:
+    if len(sys.argv) != 6:
         sys.exit("Usage: geopy.py [videoPath] [nmeaPath] [bitMaskPath] [videoStartFrame] [nmeaStartLine]")
 
     videoPath = sys.argv[1]
@@ -261,4 +220,31 @@ if __name__ == "__main__":
     cleanUp = True  # False if you want to keep images without metadata
 
     # start the script
-    ProcessVideoAndNMEA(videoPath, nmeaPath, bitMaskPath, videoStartFrame, nmeaStartLine, cleanUp)
+    outputDir = 'output_frames'
+    CreateDir(outputDir)
+
+    outputDirComp = 'outputJPGGPS'
+    CreateDir(outputDirComp)
+
+    CheckPathStartFiles(videoPath)
+    CheckReadability(videoPath)
+
+    videoCap = cv2.VideoCapture(videoPath)
+    frameRate = int(videoCap.get(cv2.CAP_PROP_FPS))
+    ExtractFramesFromVideo(videoCap, frameRate, outputDir, videoStartFrame)
+
+    CheckPathStartFiles(nmeaPath)
+    CheckReadability(nmeaPath)
+    gpggaCount = CountGPGGALines(nmeaPath)
+
+    CheckPathStartFiles(bitMaskPath)
+    CheckReadability(bitMaskPath)
+    bitMask = ReadAndParseBitMask(bitMaskPath)
+
+    MatchBitMaskGPGGA(len(bitMask), gpggaCount)
+    arrayNMEAString = PrepareNMEAString(nmeaPath, bitMask, nmeaStartLine)
+
+    WriteMetadataToImage(outputDir, arrayNMEAString, outputDirComp)
+
+    if cleanUp:
+        shutil.rmtree(outputDir)

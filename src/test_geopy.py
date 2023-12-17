@@ -1,17 +1,27 @@
 import os.path
 import tempfile
 import pytest
-from src.geopy import *
+from geopy import *
 
 
 def test_WriteMetadataToImage():
-    # TODO ----------------------------------------------------
-    pass
+    with tempfile.TemporaryDirectory() as tempOutputFramesDir, tempfile.TemporaryDirectory() as tempOutputDirComp:
 
+        img = 'noMetadataImg.jpg'
+        shutil.copy(img, tempOutputFramesDir)
+        nmeaString = ['$GPGGA,095805.000,5247.568,N,01309.697,E,1,12,1.0,0.0,M,0.0,M,,*63', None, None, '$GPGGA,095808.000,5201.528,N,01025.562,E,1,12,1.0,0.0,M,0.0,M,,*6C', '$GPGGA,095809.000,5323.393,N,01032.813,E,1,12,1.0,0.0,M,0.0,M,,*67', '$GPGGA,095810.000,5346.481,N,01233.442,E,1,12,1.0,0.0,M,0.0,M,,*63', '$GPGGA,095811.000,5054.598,N,01130.820,E,1,12,1.0,0.0,M,0.0,M,,*63', '$GPGGA,095812.000,5043.353,N,00905.142,E,1,12,1.0,0.0,M,0.0,M,,*65', '$GPGGA,095813.000,5002.158,N,01144.004,E,1,12,1.0,0.0,M,0.0,M,,*67', '$GPGGA,095814.000,5104.969,N,01343.315,E,1,12,1.0,0.0,M,0.0,M,,*6B', '$GPGGA,095815.000,5228.164,N,01351.885,E,1,12,1.0,0.0,M,0.0,M,,*63', '$GPGGA,095816.000,5402.015,N,01324.199,E,1,12,1.0,0.0,M,0.0,M,,*6F', '$GPGGA,095817.000,5341.802,N,00913.052,E,1,12,1.0,0.0,M,0.0,M,,*69', '$GPGGA,095818.000,5215.686,N,00751.973,E,1,12,1.0,0.0,M,0.0,M,,*66']
 
-def test_ProcessVideoAndNMEA():
-    # TODO ----------------------------------------------------
-    pass
+        WriteMetadataToImage(tempOutputFramesDir, nmeaString, tempOutputDirComp)
+
+        imgOut = os.path.join(tempOutputDirComp, os.path.basename(img))
+        assert os.path.isfile(imgOut), f"Processed image not found in {tempOutputDirComp}"
+
+        # Load img and check metadata
+        try:
+            exifDict = piexif.load(imgOut)
+            assert "GPS" in exifDict, "No GPS metadata in img"
+        except piexif.InvalidImageDataError:
+            pytest.fail(f"Invalid img data for {imgOut}")
 
 
 def test_ExtractFramesFromVideo():
@@ -20,10 +30,10 @@ def test_ExtractFramesFromVideo():
     with tempfile.TemporaryDirectory() as tempOutputDir:
         video = cv2.VideoCapture(sampleVideoPath)
 
-        frameRate = 24
-        startFrame = 0
+        frameRateTest = 24
+        startFrameTest = 0
 
-        ExtractFramesFromVideo(video, frameRate, tempOutputDir, startFrame)
+        ExtractFramesFromVideo(video, frameRateTest, tempOutputDir, startFrameTest)
 
         extractedFiles = os.listdir(tempOutputDir)
         expectedNumberOfFrames = 16
