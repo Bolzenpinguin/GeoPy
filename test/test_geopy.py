@@ -1,7 +1,7 @@
 import os.path
 import tempfile
 import pytest
-from geopy import *
+from src.geopy import *
 
 
 def test_WriteMetadataToImage():
