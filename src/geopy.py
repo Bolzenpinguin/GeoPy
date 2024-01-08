@@ -14,6 +14,7 @@ def CheckPathStartFiles(pathFunc):
     Checks if the given path exists
     :param pathFunc: Path as a String Value
     """
+
     if not os.path.exists(pathFunc):
         raise FileNotFoundError(f"File in '{pathFunc}' does not exist.")
 
@@ -23,6 +24,7 @@ def CheckReadability(pathFunc):
     Checks if the given path is readable
     :param pathFunc: Path as a String Value
     """
+
     if not os.access(pathFunc, os.R_OK):
         raise PermissionError(f"Cannot read the file '{pathFunc}'.")
 
@@ -32,6 +34,7 @@ def CreateDir(nameFunc):
     Create a directory if it not exists
     :param nameFunc: Name of the directory as String
     """
+
     if not os.path.exists(nameFunc):
         os.makedirs(nameFunc)
     return os.path.isdir(nameFunc)
@@ -45,6 +48,7 @@ def ExtractFramesFromVideo(videoFunc, frameRateFunc, outputDirFunc, startFrameFu
     :param outputDirFunc: Directory to save frames
     :param startFrameFunc: Starting frame position in the video
     """
+
     frameCounter = startFrameFunc
     frameSortingNumber = 0
 
@@ -69,6 +73,7 @@ def CountGPGGALines(nmeaPathCountingFunc):
     :param nmeaPathCountingFunc: Path to the NMEA File
     :return: Number of GPGGA lines
     """
+
     gpggaCount = 0
     with open(nmeaPathCountingFunc, 'r') as nmeaFile:
         for line in nmeaFile:
@@ -83,6 +88,7 @@ def ReadAndParseBitMask(bitMaskPathReadAndParseFunc):
     :param bitMaskPathReadAndParseFunc: Path to the Bit Mask File
     :return: Bit mask array
     """
+
     with open(bitMaskPathReadAndParseFunc, 'r') as bitMaskFile:
         bitMaskString = bitMaskFile.read().strip()
         bitMask = [bool(int(bit)) for bit in bitMaskString]
@@ -93,8 +99,9 @@ def MatchBitMaskGPGGA(lengthBitFunc, lengthGPGGAFunc):
     """
     Compares the length of bit mask with the number of GPGGA lines
     :param lengthBitFunc: Length of the bit mask
-    :param lengthGPGGAFunc: Number of GPGGA lines
+    :param: lengthGPGGAFunc: Number of GPGGA lines
     """
+
     if lengthBitFunc != lengthGPGGAFunc:
         if lengthBitFunc < lengthGPGGAFunc:
             exit(f"Bit mask ({lengthBitFunc}) is shorter than the number of $GPGGA lines ({lengthGPGGAFunc})")
@@ -139,6 +146,7 @@ def CalcGPSinEXIF(decimalDegreesFunc):
     return (67, 1), (24, 1), (26, 1) \n
     -> The 1 means that the value is finished -> (6700, 100) would be converted into 67
     """
+
     degrees = int(decimalDegreesFunc / 100)
     minutes = int(decimalDegreesFunc - (degrees * 100))
     decimalMinutes = decimalDegreesFunc - (degrees * 100) - minutes
@@ -153,6 +161,7 @@ def ExtractGPSDataFromNMEAString(nmeaStringFunc):
     :param nmeaStringFunc: A single NMEA string
     :return: Tuple containing GPS latitude reference, longitude reference, latitude, and longitude.
     """
+
     gpsLatRef = nmeaStringFunc.split(',')[3]
     gpsLongRef = nmeaStringFunc.split(',')[5]
     gpsLat = CalcGPSinEXIF(float(nmeaStringFunc.split(',')[2]))
@@ -167,6 +176,7 @@ def WriteMetadataToImage(outputFramesDirFunc, arrayNMEAStringFunc, outputDirComp
     :param arrayNMEAStringFunc: Array of NMEA strings corresponding to each image.
     :param outputDirCompFunc: Directory where the processed images will be saved.
     """
+
     count = 0
     firstCheckNMEA = False
     endWrittenImage = None
