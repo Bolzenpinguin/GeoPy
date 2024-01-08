@@ -11,8 +11,9 @@ from PIL import Image
 
 def CheckPathStartFiles(pathFunc):
     """
-    Checks if the given path exists
     :param pathFunc: Path as a String Value
+
+    Checks if the given path exists
     """
 
     if not os.path.exists(pathFunc):
@@ -21,8 +22,9 @@ def CheckPathStartFiles(pathFunc):
 
 def CheckReadability(pathFunc):
     """
-    Checks if the given path is readable
     :param pathFunc: Path as a String Value
+
+    Checks if the given path is readable
     """
 
     if not os.access(pathFunc, os.R_OK):
@@ -31,8 +33,9 @@ def CheckReadability(pathFunc):
 
 def CreateDir(nameFunc):
     """
-    Create a directory if it not exists
     :param nameFunc: Name of the directory as String
+
+    Create a directory if it not exists
     """
 
     if not os.path.exists(nameFunc):
@@ -42,11 +45,12 @@ def CreateDir(nameFunc):
 
 def ExtractFramesFromVideo(videoFunc, frameRateFunc, outputDirFunc, startFrameFunc):
     """
-    Extracts frames from the video file.
     :param videoFunc: Open Video File
     :param frameRateFunc: Frame rate of the video
     :param outputDirFunc: Directory to save frames
     :param startFrameFunc: Starting frame position in the video
+
+    Extracts frames from the video file.
     """
 
     frameCounter = startFrameFunc
@@ -69,9 +73,10 @@ def ExtractFramesFromVideo(videoFunc, frameRateFunc, outputDirFunc, startFrameFu
 
 def CountGPGGALines(nmeaPathCountingFunc):
     """
-    Counts the number of GPGGA lines in the NMEA file
     :param nmeaPathCountingFunc: Path to the NMEA File
     :return: Number of GPGGA lines
+
+    Counts the number of GPGGA lines in the NMEA file
     """
 
     gpggaCount = 0
@@ -84,9 +89,10 @@ def CountGPGGALines(nmeaPathCountingFunc):
 
 def ReadAndParseBitMask(bitMaskPathReadAndParseFunc):
     """
-    Reads and parses the bit mask file as boolean in an array
     :param bitMaskPathReadAndParseFunc: Path to the Bit Mask File
     :return: Bit mask array
+
+    Reads and parses the bit mask file as boolean in an array
     """
 
     with open(bitMaskPathReadAndParseFunc, 'r') as bitMaskFile:
@@ -97,9 +103,10 @@ def ReadAndParseBitMask(bitMaskPathReadAndParseFunc):
 
 def MatchBitMaskGPGGA(lengthBitFunc, lengthGPGGAFunc):
     """
-    Compares the length of bit mask with the number of GPGGA lines
     :param lengthBitFunc: Length of the bit mask
     :param: lengthGPGGAFunc: Number of GPGGA lines
+
+    Compares the length of bit mask with the number of GPGGA lines
     """
 
     if lengthBitFunc != lengthGPGGAFunc:
@@ -109,11 +116,12 @@ def MatchBitMaskGPGGA(lengthBitFunc, lengthGPGGAFunc):
 
 def PrepareNMEAString(nmeaPathPreparingFunc, bitMaskPreparingFunc, nmeaStartLinePreparingFunc):
     """
-    Prepares the NMEA string based on the bit mask, positions with False get set to None
     :param nmeaPathPreparingFunc: Path to the NMEA File
     :param bitMaskPreparingFunc: Bit Mask array
     :param nmeaStartLinePreparingFunc: Starting line of the NMEA data
     :return: Array of NMEA strings
+
+    Prepares the NMEA string based on the bit mask, positions with False get set to None
     """
 
     arrayNMEA = []
@@ -157,9 +165,10 @@ def CalcGPSinEXIF(decimalDegreesFunc):
 
 def ExtractGPSDataFromNMEAString(nmeaStringFunc):
     """
-    Extracts GPS data from NMEA string
     :param nmeaStringFunc: A single NMEA string
     :return: Tuple containing GPS latitude reference, longitude reference, latitude, and longitude.
+
+    Extracts GPS data from NMEA string
     """
 
     gpsLatRef = nmeaStringFunc.split(',')[3]
@@ -171,10 +180,11 @@ def ExtractGPSDataFromNMEAString(nmeaStringFunc):
 
 def WriteMetadataToImage(outputFramesDirFunc, arrayNMEAStringFunc, outputDirCompFunc):
     """
-    Writes metadata to images based on the NMEA string
     :param outputFramesDirFunc: Directory containing the frame images.
     :param arrayNMEAStringFunc: Array of NMEA strings corresponding to each image.
     :param outputDirCompFunc: Directory where the processed images will be saved.
+
+    Writes metadata to images based on the NMEA string
     """
 
     count = 0
