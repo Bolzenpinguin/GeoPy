@@ -170,3 +170,5 @@ src/output_frames/
 # macOS DS_Store
 .DS_Store
 
+# exlude test
+test
