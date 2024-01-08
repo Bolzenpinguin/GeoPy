@@ -7,7 +7,8 @@ from src.geopy import *
 def test_WriteMetadataToImage():
     with tempfile.TemporaryDirectory() as tempOutputFramesDir, tempfile.TemporaryDirectory() as tempOutputDirComp:
 
-        img = 'noMetadataImg.jpg'
+        scriptDir = os.path.dirname(__file__)
+        img = os.path.join(scriptDir, 'noMetadataImg.jpg')
         shutil.copy(img, tempOutputFramesDir)
         nmeaString = ['$GPGGA,095805.000,5247.568,N,01309.697,E,1,12,1.0,0.0,M,0.0,M,,*63', None, None, '$GPGGA,095808.000,5201.528,N,01025.562,E,1,12,1.0,0.0,M,0.0,M,,*6C', '$GPGGA,095809.000,5323.393,N,01032.813,E,1,12,1.0,0.0,M,0.0,M,,*67', '$GPGGA,095810.000,5346.481,N,01233.442,E,1,12,1.0,0.0,M,0.0,M,,*63', '$GPGGA,095811.000,5054.598,N,01130.820,E,1,12,1.0,0.0,M,0.0,M,,*63', '$GPGGA,095812.000,5043.353,N,00905.142,E,1,12,1.0,0.0,M,0.0,M,,*65', '$GPGGA,095813.000,5002.158,N,01144.004,E,1,12,1.0,0.0,M,0.0,M,,*67', '$GPGGA,095814.000,5104.969,N,01343.315,E,1,12,1.0,0.0,M,0.0,M,,*6B', '$GPGGA,095815.000,5228.164,N,01351.885,E,1,12,1.0,0.0,M,0.0,M,,*63', '$GPGGA,095816.000,5402.015,N,01324.199,E,1,12,1.0,0.0,M,0.0,M,,*6F', '$GPGGA,095817.000,5341.802,N,00913.052,E,1,12,1.0,0.0,M,0.0,M,,*69', '$GPGGA,095818.000,5215.686,N,00751.973,E,1,12,1.0,0.0,M,0.0,M,,*66']
 
@@ -25,7 +26,8 @@ def test_WriteMetadataToImage():
 
 
 def test_ExtractFramesFromVideo():
-    sampleVideoPath = 'sample24Frames16Seconds.mp4'
+    scriptDir = os.path.dirname(__file__)
+    sampleVideoPath = os.path.join(scriptDir, 'sample24Frames16Seconds.mp4')  # Correct the file extension to .mp4
 
     with tempfile.TemporaryDirectory() as tempOutputDir:
         video = cv2.VideoCapture(sampleVideoPath)
