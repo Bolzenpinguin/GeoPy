@@ -171,4 +171,4 @@ src/output_frames/
 .DS_Store
 
 # exlude test
-test/*
+test/
