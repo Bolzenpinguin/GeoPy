@@ -14,9 +14,19 @@ and assigns GPS data to these frames using the values from a NMEA file.
 ## How to Use
 1. Make sure that you have an MP4 video file, a NMEA file and a bitmask file ready. The NMEA file must contain GPS data in the '$GPGGA' format and the bitmask file should only be a sequence of boolean values.
 2. Now you can execute the script with the required arguments like this:
-    ```python geopy.py /path/to/video.mp4 /path/to/nmea.txt /path/to/bitmask.txt 0 0``` 
-   
+
+    ```$ python geopy.py /path/to/video.mp4 /path/to/nmea.txt /path/to/bitmask.txt 0 0``` 
+
     This will process the video from the beginning and use the NMEA from the start.
+
+## Extra Information
+The file of the bitmask should look for an example something like this: 
+
+```11110001101111111011111111111111111111```
+
+This example means that you want to use lines one to four, but not lines five to seven and so on.
+The bitmask should be at least as long as the lines in the NMEA file. 
+If they are longer, then this is not a problem.
 
 ## Functionality Overview
 ### CheckPathStartFiles(pathFunc)

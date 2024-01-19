@@ -1,4 +1,5 @@
 # ************************************ Import Modules *********************************
+import argparse
 import shutil
 import os
 import sys
@@ -225,18 +226,25 @@ def WriteMetadataToImage(outputFramesDirFunc, arrayNMEAStringFunc, outputDirComp
         print(f"No Metadata written up Image: {endWrittenImage}")
 
 
+# ************************************ argparse ***********************************
+parser = argparse.ArgumentParser(description="Get images from a MP4 File and write GPS positions to them.")
+parser.add_argument("videoPath", help="Path to the video file as string")
+parser.add_argument("nmeaPath", help="Path to the NMEA file as string")
+parser.add_argument("bitMaskPath", help="Path to the boolean bitmask file (specifies which NMEA lines to use)")
+parser.add_argument("videoStartFrame", type=int, help="Start of the first frame (set to 0 to begin from the start)")
+parser.add_argument("nmeaStartLine", type=int, help="Define at which line the NMEA file starts")
+
+args = parser.parse_args()
+
 # ************************************ Main Script *********************************
 if __name__ == "__main__":
 
-    # Check for arguments
-    if len(sys.argv) != 6:
-        sys.exit("Usage: geopy.py [videoPath] [nmeaPath] [bitMaskPath] [videoStartFrame] [nmeaStartLine]")
+    videoPath = args.videoPath
+    nmeaPath = args.nmeaPath
+    bitMaskPath = args.bitMaskPath
+    videoStartFrame = args.videoStartFrame
+    nmeaStartLine = args.nmeaStartLine
 
-    videoPath = sys.argv[1]
-    nmeaPath = sys.argv[2]
-    bitMaskPath = sys.argv[3]
-    videoStartFrame = int(sys.argv[4])
-    nmeaStartLine = int(sys.argv[5])
     cleanUp = True  # False if you want to keep images without metadata
 
     # start the script
