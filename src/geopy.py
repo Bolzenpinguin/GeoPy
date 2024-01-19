@@ -232,7 +232,7 @@ parser.add_argument("videoPath", help="Path to the video file as string")
 parser.add_argument("nmeaPath", help="Path to the NMEA file as string")
 parser.add_argument("bitMaskPath", help="Path to the boolean bitmask file (specifies which NMEA lines to use)")
 parser.add_argument("videoStartFrame", type=int, help="Start of the first frame (set to 0 to begin from the start)")
-parser.add_argument("nmeaStartLine", type=int, help="Define at which line the NMEA file starts")
+parser.add_argument("nmeaStartLine", type=int, help="Start of the first line from the NMEA file (0 to begin from start")
 
 args = parser.parse_args()
 
