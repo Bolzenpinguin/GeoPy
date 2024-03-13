@@ -1,0 +1,122 @@
+:root {
+  /* Typography */
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  /* Color */
+  color: #f6f6f6;
+
+  /* Background */
+  background-image: url("assets/Background.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.container {
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding-top: 10vh;
+}
+
+.box {
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 25px 50px;
+  padding: 25px 10px;
+
+  /* Background */
+  background: #FAF9F6;
+
+  /* Border & Shadow */
+  border-radius: 5px;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+.content {
+  /* Layout */
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.column-input, .column-button, .column-left, .column-right {
+  /* Layout */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  flex-direction: column;
+}
+
+.input-box {
+  /* Layout */
+  width: 600px;
+  height: 40px;
+  text-align: center;
+  font-size: 14px;
+
+  /* Border */
+  border-color: #0D6759;
+  border-width: 1px;
+  border-radius: 10px;
+}
+
+::placeholder {
+  /* Typography */
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+}
+
+h4, h1 {
+  /* Typography & Color */
+  color: #2A044A;
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+}
+
+.btn{
+  /* Layout */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 25px;
+  cursor: pointer;
+
+  /* Typography & Color */
+  font-weight: 0;
+  font-size: 14px;
+  color: #fff;
+
+  /* Background */
+  background-color: #0d6759;
+
+  /* Border & Shadow */
+  border: none;
+  box-shadow: none;
+  border-radius: 25px;
+}
+
+.btn:hover{
+  /* Color */
+  background-color: #0d6759;
+  color: #d9d9d9;
+
+  /* Border */
+  border: none;
+}
