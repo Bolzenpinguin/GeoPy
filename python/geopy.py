@@ -2,7 +2,6 @@
 import argparse
 import shutil
 import os
-import sys
 import cv2
 import piexif
 from PIL import Image
@@ -246,6 +245,7 @@ if __name__ == "__main__":
     nmeaStartLine = args.nmeaStartLine
 
     cleanUp = True  # False if you want to keep images without metadata
+    #bitMaskProvided = True  # False if not bitmask needed
 
     # start the script
     outputDir = 'output_frames'

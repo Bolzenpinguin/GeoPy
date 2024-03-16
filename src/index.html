@@ -9,22 +9,87 @@
   </head>
 
   <body>
-  <div class="container">
-    <h1>Welcome to GeoPy!</h1>
-    <div class="box">
-      <h4>The Path to the Video File</h4>
-      <div class="content">
-        <div class="column-input">
-          <input type="text" id="videoPath" class="input-box" placeholder="Path/to/the/video/file"/>
+    <div class="container">
+      <h1>Welcome to GeoPy!</h1>
+      <div class="box">
+        <h4>The Path to the Video File</h4>
+        <div class="content">
+          <div class="column-input">
+            <input type="text" id="videoPath" class="input-box" placeholder="Path/to/the/video/file"/>
+          </div>
+          <div class="column-button">
+            <button class="btn" id="btnVideoPath">
+              Open File Explorer
+              <img src="assets/icons/open-folder-svgrepo-com.svg" alt="Folder open icon" width="24" height="24">
+            </button>
+          </div>
         </div>
-        <div class="column-button">
-          <button class="btn" id="getVideoPath">Get Video filepath</button>
-        </div>
-      </div>
-      <div class="content">
         <h4>The Path to the NMEA File</h4>
+        <div class="content">
+          <div class="column-input">
+            <input type="text" id="nmeaPath" class="input-box" placeholder="Path/to/the/nmea/file"/>
+          </div>
+          <div class="column-button">
+            <button class="btn" id="btnNMEA">
+              Open File Explorer
+              <img src="assets/icons/open-folder-svgrepo-com.svg" alt="Folder open icon" width="24" height="24">
+            </button>
+          </div>
+        </div>
+        <hr class="breaker">
+        <h4>The Place for saving the pictures</h4>
+        <div class="content">
+          <div class="column-input">
+            <input type="text" id="savePath" class="input-box" placeholder="Path/to/the/saving/folder"/>
+          </div>
+          <div class="column-button">
+            <button class="btn" id="btnSaveDic">
+              Open File Explorer
+              <img src="assets/icons/open-folder-svgrepo-com.svg" alt="Folder open icon" width="24" height="24">
+            </button>
+          </div>
+        </div>
+        <hr class="breaker">
+        <div class="container">
+          <div class="column-button">
+            <button class="btn" id="btnStart">
+              Start the Programm
+            </button>
+          </div>
+        </div>
+        <hr class="breaker">
+        <h5>Advanced Settings</h5>
+        <div class="accordion-container">
+          <button class="accordion" id="openAccordion">
+            <img src="assets/icons/arrow-down-to-bracket-svgrepo-com.svg" alt="Open Advanced Settings Icon" width="24" height="24">
+          </button>
+          <div class="panel">
+            <div class="content">
+              <div class="column-left">
+                <h4>Start of the first Frame</h4>
+                <div class="container">
+                  <input type="number" id="firstFrame" class="input-box-small" placeholder="0">
+                </div>
+              </div>
+              <div class="column-middle">
+                <h4>Start of the first NMEA Line</h4>
+                <div class="container">
+                  <input type="number" id="firstNMEALine" class="input-box-small" placeholder="0">
+                </div>
+              </div>
+              <div class="column-right">
+                <h4>Bitmask</h4>
+                <div class="container">
+                  <button class="btn" id="getBitMaks">
+                    Open File Explorer
+                    <img src="assets/icons/open-folder-svgrepo-com.svg" alt="Open Bitmask file" width="24" height="24">
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
   </body>
 </html>
