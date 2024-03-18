@@ -11,11 +11,37 @@ const pathToTheSaveFolder = document.getElementById('savePath');
 const btnSavePlace = document.getElementById('btnSaveDic');
 
 const btnBitmask = document.getElementById('getBitMaks');
+const pathToBitmask = document.getElementById('pathToBitmask');
+
+const startFrame = document.getElementById('firstFrame').value;
+const startNMEALine = document.getElementById('firstNMEALine').value;
+
+const startBTN = document.getElementById('btnStart');
 
 
+// Start the Python Script
+startBTN.addEventListener('click', async () => {
+  const param1 = document.getElementById('videoPath').value;
+  const param2 = document.getElementById('nmeaPath').value;
+  const param3 = pathToBitmask.value;
+  console.log(param3);
+  const param4 = document.getElementById('firstFrame').value;
+  const param5 = document.getElementById('firstNMEALine').value;
 
-
-
+  window.__TAURI__.invoke('run_python_script', {
+    param1,
+    param2,
+    param3,
+    param4,
+    param5
+  })
+      .then((output) => {
+        console.log(output);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+});
 
 // Open Bitmask File
 btnBitmask.addEventListener('click', async () => {
@@ -28,7 +54,7 @@ btnBitmask.addEventListener('click', async () => {
       multiple: false,
     });
     if (selected) {
-      let pathToBitmask = selected;
+      pathToBitmask.value = selected;
       document.getElementById('getBitMaks').innerHTML = `
         File Selected
         <img src="assets/icons/check-svgrepo-com.svg" alt="File selected" width="24" height="24">
