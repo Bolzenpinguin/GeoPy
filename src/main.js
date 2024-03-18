@@ -24,16 +24,21 @@ startBTN.addEventListener('click', async () => {
   const param1 = document.getElementById('videoPath').value;
   const param2 = document.getElementById('nmeaPath').value;
   const param3 = pathToBitmask.value;
-  console.log(param3);
-  const param4 = document.getElementById('firstFrame').value;
-  const param5 = document.getElementById('firstNMEALine').value;
+  const param4 = startFrame.value;
+  const param5 = startNMEALine.value;
+  const param6 = pathToTheSaveFolder.value;
+  const param7 = 'true';
+  const param8 = 'false';
 
   window.__TAURI__.invoke('run_python_script', {
     param1,
     param2,
     param3,
     param4,
-    param5
+    param5,
+    param6,
+    param7,
+    param8
   })
       .then((output) => {
         console.log(output);

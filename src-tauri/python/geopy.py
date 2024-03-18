@@ -5,6 +5,7 @@ import os
 import cv2
 import piexif
 from PIL import Image
+import datetime
 
 
 # ************************************ Function Definitions *********************************
@@ -29,18 +30,6 @@ def CheckReadability(pathFunc):
 
     if not os.access(pathFunc, os.R_OK):
         raise PermissionError(f"Cannot read the file '{pathFunc}'.")
-
-
-def CreateDir(nameFunc):
-    """
-    :param nameFunc: Name of the directory as String
-
-    Create a directory if it not exists
-    """
-
-    if not os.path.exists(nameFunc):
-        os.makedirs(nameFunc)
-    return os.path.isdir(nameFunc)
 
 
 def ExtractFramesFromVideo(videoFunc, frameRateFunc, outputDirFunc, startFrameFunc):
@@ -225,6 +214,16 @@ def WriteMetadataToImage(outputFramesDirFunc, arrayNMEAStringFunc, outputDirComp
         print(f"No Metadata written up Image: {endWrittenImage}")
 
 
+def CreateDirectoryWithTimestamp(basePath, baseName):
+    now = datetime.datetime.now()
+    date = now.strftime("%d%m%Y%H%M")
+    directoryName = f"{baseName}{date}"
+    fullPath = os.path.join(basePath, directoryName)
+    if not os.path.exists(fullPath):
+        os.makedirs(fullPath)
+    return fullPath
+
+
 # ************************************ argparse ***********************************
 parser = argparse.ArgumentParser(description="Get images from a MP4 File and write GPS positions to them.")
 parser.add_argument("videoPath", help="Path to the video file as string")
@@ -232,6 +231,9 @@ parser.add_argument("nmeaPath", help="Path to the NMEA file as string")
 parser.add_argument("bitMaskPath", help="Path to the boolean bitmask file (specifies which NMEA lines to use)")
 parser.add_argument("videoStartFrame", type=int, help="Start of the first frame (set to 0 to begin from the start)")
 parser.add_argument("nmeaStartLine", type=int, help="Start of the first line from the NMEA file (0 to begin from start")
+parser.add_argument("saveDirect", help="Name of the Folder for saving the files")
+parser.add_argument("bitMaskProvided", type=bool, help="Bool, Bitmask there or not")
+parser.add_argument("cleanUp", type=bool, help="Delete the folder with the images without metadat")
 
 args = parser.parse_args()
 
@@ -243,16 +245,12 @@ if __name__ == "__main__":
     bitMaskPath = args.bitMaskPath
     videoStartFrame = args.videoStartFrame
     nmeaStartLine = args.nmeaStartLine
+    saveDirect = args.saveDirect
+    bitMaskProvided = args.bitMaskProvided
+    cleanUp = args.cleanUp
 
-    cleanUp = True  # False if you want to keep images without metadata
-    #bitMaskProvided = True  # False if not bitmask needed
-
-    # start the script
-    outputDir = 'output_frames'
-    CreateDir(outputDir)
-
-    outputDirComp = 'outputJPGGPS'
-    CreateDir(outputDirComp)
+    outputDir = CreateDirectoryWithTimestamp(saveDirect, 'GeoPyTEMP')
+    outputDirComp = CreateDirectoryWithTimestamp(saveDirect, 'GeoPy')
 
     CheckPathStartFiles(videoPath)
     CheckReadability(videoPath)
