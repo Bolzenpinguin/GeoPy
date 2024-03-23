@@ -13,39 +13,73 @@ const btnSavePlace = document.getElementById('btnSaveDic');
 const btnBitmask = document.getElementById('getBitMaks');
 const pathToBitmask = document.getElementById('pathToBitmask');
 
-const startFrame = document.getElementById('firstFrame').value;
-const startNMEALine = document.getElementById('firstNMEALine').value;
+const startFrameField = document.getElementById('firstFrame');
+const startNMEALineField = document.getElementById('firstNMEALine');
 
 const startBTN = document.getElementById('btnStart');
+
+let cleanUp = false;
+const cleanupBox = document.getElementById('cleanup');
 
 
 // Start the Python Script
 startBTN.addEventListener('click', async () => {
-  const param1 = document.getElementById('videoPath').value;
-  const param2 = document.getElementById('nmeaPath').value;
+
+  let startFrame= parseInt(startFrameField.value, 10);
+  let startNMEALine= parseInt(startNMEALineField.value, 10);
+
+  let cleanUp = false;
+  const cleanupBox = document.getElementById('cleanup');
+
+  if (cleanupBox.checked) {
+    cleanUp = true;
+  }
+
+  // set to default values if not declared
+  if (isNaN(startFrame) )
+    startFrame = 0;
+
+  if (isNaN(startNMEALine) )
+    startNMEALine = 0;
+
+  // create parameter list
+  const parameter = [
+      pathToTheVideoFile.value,
+      pathToTheNMEAFile.value,
+      pathToBitmask.value,
+      startFrame,
+      startNMEALine,
+      pathToTheSaveFolder.value,
+      'true',
+      cleanUp
+  ]
+
+
+  /*
+  const param1 = pathToTheVideoFile.value;
+  const param2 = btnPathToNMEA.value;
   const param3 = pathToBitmask.value;
   const param4 = startFrame.value;
   const param5 = startNMEALine.value;
   const param6 = pathToTheSaveFolder.value;
   const param7 = 'true';
   const param8 = 'false';
+  */
 
-  window.__TAURI__.invoke('run_python_script', {
-    param1,
-    param2,
-    param3,
-    param4,
-    param5,
-    param6,
-    param7,
-    param8
-  })
-      .then((output) => {
-        console.log(output);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  for (let i = 0; i < parameter.length; i++) {
+    console.log(parameter[i]);
+  }
+
+  // prepare Array for transfer to backend -> convert everything to a string
+  const paramsObject = parameter.map(param => String(param)).reduce((obj, param, index) => {
+    obj[`param${index + 1}`] = param;
+    return obj;
+  }, {});
+
+
+  // run python script
+  window.__TAURI__.invoke('run_backend', paramsObject);
+
 });
 
 // Open Bitmask File

@@ -229,11 +229,11 @@ parser = argparse.ArgumentParser(description="Get images from a MP4 File and wri
 parser.add_argument("videoPath", help="Path to the video file as string")
 parser.add_argument("nmeaPath", help="Path to the NMEA file as string")
 parser.add_argument("bitMaskPath", help="Path to the boolean bitmask file (specifies which NMEA lines to use)")
-parser.add_argument("videoStartFrame", type=int, help="Start of the first frame (set to 0 to begin from the start)")
-parser.add_argument("nmeaStartLine", type=int, help="Start of the first line from the NMEA file (0 to begin from start")
+parser.add_argument("videoStartFrame", help="Start of the first frame (set to 0 to begin from the start)")
+parser.add_argument("nmeaStartLine", help="Start of the first line from the NMEA file (0 to begin from start")
 parser.add_argument("saveDirect", help="Name of the Folder for saving the files")
-parser.add_argument("bitMaskProvided", type=bool, help="Bool, Bitmask there or not")
-parser.add_argument("cleanUp", type=bool, help="Delete the folder with the images without metadat")
+parser.add_argument("bitMaskProvided", help="Bool, Bitmask there or not")
+parser.add_argument("cleanUp", help="Delete the folder with the images without metadat")
 
 args = parser.parse_args()
 
@@ -243,11 +243,11 @@ if __name__ == "__main__":
     videoPath = args.videoPath
     nmeaPath = args.nmeaPath
     bitMaskPath = args.bitMaskPath
-    videoStartFrame = args.videoStartFrame
-    nmeaStartLine = args.nmeaStartLine
+    videoStartFrame = int(args.videoStartFrame)
+    nmeaStartLine = int(args.nmeaStartLine)
     saveDirect = args.saveDirect
-    bitMaskProvided = args.bitMaskProvided
-    cleanUp = args.cleanUp
+    bitMaskProvided = bool(args.bitMaskProvided)
+    cleanUp = bool(args.cleanUp)
 
     outputDir = CreateDirectoryWithTimestamp(saveDirect, 'GeoPyTEMP')
     outputDirComp = CreateDirectoryWithTimestamp(saveDirect, 'GeoPy')

@@ -65,26 +65,27 @@
             <div class="content">
               <div class="column-left">
                 <h4>Start of the first Frame</h4>
-                <div class="container">
-                  <input type="number" id="firstFrame" class="input-box-small" placeholder="0">
-                </div>
+                  <input type="number" id="firstFrame" class="input-box-small" placeholder="0" min="0">
               </div>
               <div class="column-middle">
                 <h4>Start of the first NMEA Line</h4>
-                <div class="container">
-                  <input type="number" id="firstNMEALine" class="input-box-small" placeholder="0">
-                </div>
+                  <input type="number" id="firstNMEALine" class="input-box-small" placeholder="0" min="0">
               </div>
               <div class="column-right">
                 <h4>Bitmask</h4>
-                <div class="container">
                   <input type="text" id="pathToBitmask" class="" placeholder="Path/to/the/bit/mask"/>
                   <button class="btn" id="getBitMaks">
                     Open File Explorer
                     <img src="assets/icons/open-folder-svgrepo-com.svg" alt="Open Bitmask file" width="24" height="24">
                   </button>
-                </div>
               </div>
+            </div>
+            <div class="content">
+              <div class="column-left">
+                <h4>Keep pictures without metadata</h4>
+                <input type="checkbox" id="cleanup">
+              </div>
+
             </div>
           </div>
         </div>
