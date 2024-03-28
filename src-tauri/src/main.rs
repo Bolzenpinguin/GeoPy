@@ -17,6 +17,7 @@ fn run_backend(param1: String, param2: String, param3: String, param4: String, p
         .arg("python/geopy.py")
         .args([ &param1, &param2, &param3, &param4, &param5, &param6, &param7, &param8])
         .output();
+    println!("{}", &param8);
     println!("Rust activated");
 
     match output {
@@ -31,7 +32,4 @@ fn run_backend(param1: String, param2: String, param3: String, param4: String, p
         },
         Err(e) => Err(e.to_string()),
     }
-
-
-
 }

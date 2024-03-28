@@ -18,22 +18,24 @@ const startNMEALineField = document.getElementById('firstNMEALine');
 
 const startBTN = document.getElementById('btnStart');
 
-let cleanUp = false;
-const cleanupBox = document.getElementById('cleanup');
-
 
 // Start the Python Script
 startBTN.addEventListener('click', async () => {
 
+  // Int Defaults for the start lines
   let startFrame= parseInt(startFrameField.value, 10);
   let startNMEALine= parseInt(startNMEALineField.value, 10);
 
-  let cleanUp = false;
-  const cleanupBox = document.getElementById('cleanup');
-
-  if (cleanupBox.checked) {
-    cleanUp = true;
+  // Bitmask
+  let bitmaskProvided = true;
+  if (!isNaN(Number(pathToBitmask.value))) {
+    bitmaskProvided = false;
   }
+
+  // cleanup
+  let cleanUp = document.getElementById('cleanup').checked;
+
+  console.log(cleanUp);
 
   // set to default values if not declared
   if (isNaN(startFrame) )
@@ -50,25 +52,9 @@ startBTN.addEventListener('click', async () => {
       startFrame,
       startNMEALine,
       pathToTheSaveFolder.value,
-      'true',
+      bitmaskProvided,
       cleanUp
   ]
-
-
-  /*
-  const param1 = pathToTheVideoFile.value;
-  const param2 = btnPathToNMEA.value;
-  const param3 = pathToBitmask.value;
-  const param4 = startFrame.value;
-  const param5 = startNMEALine.value;
-  const param6 = pathToTheSaveFolder.value;
-  const param7 = 'true';
-  const param8 = 'false';
-  */
-
-  for (let i = 0; i < parameter.length; i++) {
-    console.log(parameter[i]);
-  }
 
   // prepare Array for transfer to backend -> convert everything to a string
   const paramsObject = parameter.map(param => String(param)).reduce((obj, param, index) => {

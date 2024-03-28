@@ -103,7 +103,7 @@ def MatchBitMaskGPGGA(lengthBitFunc, lengthGPGGAFunc):
             exit(f"Bit mask ({lengthBitFunc}) is shorter than the number of $GPGGA lines ({lengthGPGGAFunc})")
 
 
-def PrepareNMEAString(nmeaPathPreparingFunc, bitMaskPreparingFunc, nmeaStartLinePreparingFunc):
+def PrepareNMEAStringBitMaskProvided(nmeaPathPreparingFunc, bitMaskPreparingFunc, nmeaStartLinePreparingFunc):
     """
     :param nmeaPathPreparingFunc: Path to the NMEA File
     :param bitMaskPreparingFunc: Bit Mask array
@@ -125,6 +125,25 @@ def PrepareNMEAString(nmeaPathPreparingFunc, bitMaskPreparingFunc, nmeaStartLine
                     else:
                         arrayNMEA.append(None)
                 gpggaIndex += 1
+
+    return arrayNMEA
+
+
+def PrepareNMEAString(nmeaPathPreparingFunc, nmeaStartLinePreparingFunc):
+    """
+    :param nmeaPathPreparingFunc: Path to the NMEA File
+    :param nmeaStartLinePreparingFunc: Starting line of the NMEA data
+    :return: Array of NMEA strings
+
+    Prepares the NMEA string
+    """
+
+    arrayNMEA = []
+
+    with open(nmeaPathPreparingFunc, 'r') as nmeaFile:
+        for index, line in enumerate(nmeaFile):
+            if line.startswith('$GPGGA') and index >= nmeaStartLinePreparingFunc:
+                arrayNMEA.append(line.strip())
 
     return arrayNMEA
 
@@ -242,11 +261,11 @@ if __name__ == "__main__":
 
     videoPath = args.videoPath
     nmeaPath = args.nmeaPath
-    bitMaskPath = args.bitMaskPath
-    videoStartFrame = int(args.videoStartFrame)
-    nmeaStartLine = int(args.nmeaStartLine)
+    bitMaskPath = args.bitMaskPath if args.bitMaskPath.lower() != 'nan' else None
+    videoStartFrame = 0 if args.videoStartFrame.lower() == 'nan' else int(args.videoStartFrame)
+    nmeaStartLine = 0 if args.nmeaStartLine.lower() == 'nan' else int(args.nmeaStartLine)
     saveDirect = args.saveDirect
-    bitMaskProvided = bool(args.bitMaskProvided)
+    bitMaskProvided = args.bitMaskProvided.lower() in 'true'
     cleanUp = bool(args.cleanUp)
 
     outputDir = CreateDirectoryWithTimestamp(saveDirect, 'GeoPyTEMP')
@@ -263,14 +282,16 @@ if __name__ == "__main__":
     CheckReadability(nmeaPath)
     gpggaCount = CountGPGGALines(nmeaPath)
 
-    CheckPathStartFiles(bitMaskPath)
-    CheckReadability(bitMaskPath)
-    bitMask = ReadAndParseBitMask(bitMaskPath)
-
-    MatchBitMaskGPGGA(len(bitMask), gpggaCount)
-    arrayNMEAString = PrepareNMEAString(nmeaPath, bitMask, nmeaStartLine)
+    if bitMaskProvided and bitMaskPath:
+        CheckPathStartFiles(bitMaskPath)
+        CheckReadability(bitMaskPath)
+        bitMask = ReadAndParseBitMask(bitMaskPath)
+        MatchBitMaskGPGGA(len(bitMask), gpggaCount)
+        arrayNMEAString = PrepareNMEAStringBitMaskProvided(nmeaPath, bitMask, nmeaStartLine)
+    else:
+        arrayNMEAString = PrepareNMEAString(nmeaPath, nmeaStartLine)
 
     WriteMetadataToImage(outputDir, arrayNMEAString, outputDirComp)
 
-    if cleanUp:
+    if not cleanUp:
         shutil.rmtree(outputDir)
