@@ -11,14 +11,6 @@ const elements = {
   accordionBtn: document.querySelector('.accordion')
 };
 
-// Get BTNs by ID
-const btns = {
-  videoPath: document.getElementById('btnVideoPath'),
-  nmeaPath: document.getElementById('btnNMEA'),
-  savePath: document.getElementById('btnSaveDic'),
-  bitmask: document.getElementById('getBitMaks')
-};
-
 // Check inputs for startBTN
 function areInputsValid() {
   return elements.videoPath.value && elements.nmeaPath.value && elements.savePath.value;
@@ -45,7 +37,7 @@ elements.accordionBtn.addEventListener('click', function() {
 });
 
 // File Selection
-const fileSelection = (element, buttonText, fileType, extensions) => async () => {
+const fileSelection = (element, dragDropArea, fileType, extensions) => async () => {
   try {
     const selected = await window.__TAURI__.dialog.open({
       filters: [{ name: fileType, extensions }],
@@ -54,7 +46,8 @@ const fileSelection = (element, buttonText, fileType, extensions) => async () =>
     });
     if (selected) {
       element.value = selected;
-      buttonText.innerHTML = `File Selected <img src="assets/icons/check-svgrepo-com.svg" alt="File selected" width="24" height="24">`;
+      const fileName = selected.split('\\').pop().split('/').pop();
+      dragDropArea.innerHTML = `<p>File Selected: <strong>${fileName}</strong></p>`;
     }
   } catch (err) {
     // TODO: Error auf Display ausgeben
@@ -63,10 +56,10 @@ const fileSelection = (element, buttonText, fileType, extensions) => async () =>
 };
 
 // Assign Event Listeners
-btns.videoPath.addEventListener('click', fileSelection(elements.videoPath, btns.videoPath, 'Video Files', ['mp4']));
-btns.nmeaPath.addEventListener('click', fileSelection(elements.nmeaPath, btns.nmeaPath, 'NMEA Files', ['nmea']));
-btns.savePath.addEventListener('click', fileSelection(elements.savePath, btns.savePath, 'Directory'));
-btns.bitmask.addEventListener('click', fileSelection(elements.bitmaskPath, btns.bitmask, 'Bitmask file', ['txt']));
+elements.videoPath.addEventListener('click', fileSelection(elements.videoPath, elements.videoPath, 'Video Files', ['mp4']));
+elements.nmeaPath.addEventListener('click', fileSelection(elements.nmeaPath, elements.nmeaPath, 'NMEA Files', ['nmea']));
+elements.savePath.addEventListener('click', fileSelection(elements.savePath, elements.savePath, 'Directory'));
+elements.bitmaskPath.addEventListener('click', fileSelection(elements.bitmaskPath, elements.bitmaskPath, 'Bitmask file', ['txt']));
 
 
 // Start Script
@@ -101,3 +94,5 @@ elements.startBtn.addEventListener('click', () => {
 
   window.__TAURI__.invoke('run_backend', paramsObject);
 });
+
+
