@@ -165,3 +165,44 @@ h5 {
   border-radius: 0 0 5px 5px;
   box-shadow: none;
 }
+
+
+.drag-area {
+  height: 200px;
+  border: 3px dashed #e0eafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 10px auto;
+  width: 100%;
+}
+
+.drag-area .icon {
+  font-size: 50px;
+  color: #0d6759;
+}
+.drag-area .header {
+  font-size: 20px;
+  font-weight: 500;
+  color: #2A044A;
+}
+.drag-area .support {
+  font-size: 12px;
+  color: gray;
+  margin: 10px 0 15px 0;
+}
+.drag-area .button {
+  font-size: 20px;
+  font-weight: 500;
+  color: #0d6759;
+  cursor: pointer;
+}
+.drag-area.active {
+  border: 2px solid #0d6759;
+}
+.drag-area img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
