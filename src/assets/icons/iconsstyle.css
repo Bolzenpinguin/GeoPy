@@ -1,0 +1,19 @@
+.upload {
+    display: inline-block;
+    width: 65px;
+    height: 65px;
+    background-image: url("file/cloud_upload/materialiconstwotone/24px.svg");
+    background-size: cover;
+}
+
+.folder {
+    display: inline-block;
+    width: 65px;
+    height: 65px;
+    background-image: url("file/drive_folder_upload/materialicons/24px.svg");
+    background-size: cover;
+}
+
+
+
+

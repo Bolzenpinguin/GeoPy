@@ -12,10 +12,26 @@ fn main() {
 
 
 #[tauri::command]
-fn run_backend(param1: String, param2: String, param3: String, param4: String, param5: String, param6: String, param7: String, param8: String) -> Result<String, String> {
+fn run_backend(
+    param1: String,
+    param2: String,
+    param3: String,
+    param4: String,
+    param5: String,
+    param6: String,
+    param7: String,
+    param8: String) -> Result<String, String> {
     let output = Command::new("python3")
         .arg("python/geopy.py")
-        .args([ &param1, &param2, &param3, &param4, &param5, &param6, &param7, &param8])
+        .args([
+            &param1,
+            &param2,
+            &param3,
+            &param4,
+            &param5,
+            &param6,
+            &param7,
+            &param8])
         .output();
     println!("{}", &param8);
     println!("Rust activated");

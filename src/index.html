@@ -1,95 +1,139 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="assets/BTcss/bootstrap.min.css"/>
-    <link rel="stylesheet" href="assets/css/style.css"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <link href="assets/BTcss/bootstrap.min.css" rel="stylesheet"/>
+    <link href="assets/css/style.css" rel="stylesheet"/>
+    <link href="assets/icons/iconsstyle.css" rel="stylesheet"/>
+    <link href="assets/css/progress-bar.css" rel="stylesheet"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>GeoPy</title>
-    <script src="assets/BTjs/bootstrap.min.js" defer></script>
-    <script type="module" src="assets/js/main.js" defer></script>
-  </head>
-  <body>
+    <script defer src="assets/BTjs/bootstrap.min.js"></script>
+    <script defer src="assets/js/main.js" type="module"></script>
+</head>
+<body>
 
-    <div class="container mt-5 boxcontainer">
-      <h1>Welcome to GeoPy!</h1>
-
-      <div class="mt-4">
-        <h4>The Video File</h4>
-        <div class="border d-flex justify-content-center align-items-center p-5 mb-3">
-          <div class="text-center drag-and-drop-area" id="videoPath">
-            <p>Drag & Drop or <button>browse</button></p>
-            <small>Supports: MP4</small>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-4">
-        <h4>The Path to the NMEA File</h4>
-        <div class="border d-flex justify-content-center align-items-center p-5 mb-3">
-          <div class="text-center drag-and-drop-area" id="nmeaPath">
-            <p>Drag & Drop or <button>browse</button></p>
-            <small>Supports: NMEA</small>
-          </div>
-        </div>
-      </div>
-
-      <!-- TODO -> BTN funzt noch net, JS auch noch anpassen   -->
-      <div class="mt-4">
-        <h4>The Place for Saving the Pictures</h4>
-        <div class="d-flex justify-content-center align-items-center p-5 mb-3">
-          <p>Please select a Directory for saving the pictures:</p>
-          <button id="browseSavePath">Browse</button>
-        </div>
-      </div>
-
-      <div class="mt-4">
-        <button class="btn btn-primary" id="btnStart">Start the Program</button>
-      </div>
-
-      <!-- Advanced Settings Accordion -->
-      <h5 class="mt-4">Advanced Settings</h5>
-      <div class="accordion" id="advancedSettings">
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingOne">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-              Advanced Settings
-            </button>
-          </h2>
-          <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#advancedSettings">
-            <div class="accordion-body">
-              <div class="row">
+<section class="boxcontainer">
+    <div class="mt-5">
+        <h1>Welcome to GeoPy!</h1>
+        <div class="container">
+            <div class="row">
                 <div class="col">
-                  <h4>Start of the First Frame</h4>
-                  <input type="number" class="form-control" placeholder="0" min="0" id="firstFrame">
-                </div>
-                <div class="col">
-                  <h4>Start of the First NMEA Line</h4>
-                  <input type="number" class="form-control" placeholder="0" min="0" id="firstNMEALine">
-                </div>
-
-                <div class="col">
-                  <h4>Bitmask</h4>
-                  <div class="border d-flex justify-content-center align-items-center p-5 mb-3">
-                    <div class="text-center drag-and-drop-area" id="pathToBitmask">
-                      <p>Drag & Drop or <button>browse</button> a TXT-File as Bitmask</p>
-                      <small>Supports: txt</small>
+                    <h4>The Video File</h4>
+                    <div class="drag-and-drop-area justify-content-center align-items-center p-5">
+                        <div id="videoPath">
+                            <i class="upload"></i>
+                            <p>Drag & Drop a video file here</p>
+                            <small>Supports: MP4</small>
+                        </div>
                     </div>
-                  </div>
                 </div>
-
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="cleanup">
-                <label class="form-check-label" for="cleanup">
-                  Keep pictures without metadata
-                </label>
-              </div>
+                <div class="col">
+                    <h4>The Path to the NMEA File</h4>
+                    <div class="drag-and-drop-area justify-content-center align-items-center p-5">
+                        <div id="nmeaPath">
+                            <i class="upload"></i>
+                            <p>Drag & Drop a NMEA File here</p>
+                            <small>Supports: NMEA</small>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
+
+        <div class="mt-4">
+            <div class="col">
+                <h4 class="text-center">The Place for Saving the Pictures</h4>
+                <div class="drag-and-drop-area justify-content-center align-items-center p-5">
+                    <div id="browseSavePath">
+                        <i class="folder"></i>
+                        <p>Drag & Drop a Directory here</p>
+                        <small>Supports: Directories</small>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-  </body>
+
+    <!-- TODO Diesen Part noch überarbeiten und BTN deaktivieren, wenn Daten nicht da sind -->
+    <div class="step-wizard-list-container">
+        <ul class="step-wizard-list">
+            <li class="step-wizard-item ">
+                <span class="progress-count">1</span>
+                <span class="progress-label">Video File</span>
+            </li>
+            <li class="step-wizard-item ">
+                <span class="progress-count">2</span>
+                <span class="progress-label">NMEA File</span>
+            </li>
+            <li class="step-wizard-item ">
+                <span class="progress-count">3</span>
+                <span class="progress-label">Save Directory</span>
+            </li>
+            <li class="step-wizard-item current-item">
+                <span class="progress-count">4</span>
+                <span class="progress-label">Start the Programm</span>
+            </li>
+        </ul>
+    </div>
+
+    <button class="btn-primary btn" id="btnStart">Start</button>
+
+    <!-- TODO Diese Section noch komplett anpassen -->
+    <!-- Advanced Settings Accordion -->
+    <h5 class="mt-4">Advanced Settings</h5>
+    <div class="accordion" id="advancedSettings">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button aria-controls="collapseOne" aria-expanded="true" class="accordion-button"
+                        data-bs-target="#collapseOne"
+                        data-bs-toggle="collapse" type="button">
+                    Advanced Settings
+                </button>
+            </h2>
+            <div aria-labelledby="headingOne" class="accordion-collapse collapse show"
+                 data-bs-parent="#advancedSettings"
+                 id="collapseOne">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col">
+                            <h4>Start of the First Frame</h4>
+                            <input class="form-control" id="firstFrame" min="0" placeholder="0" type="number">
+                        </div>
+                        <div class="col">
+                            <h4>Start of the First NMEA Line</h4>
+                            <input class="form-control" id="firstNMEALine" min="0" placeholder="0" type="number">
+                        </div>
+                    </div>
+                    <div class="accordion-body">
+                        <div class="row">
+                            <div class="col">
+                                <h4>Bitmask</h4>
+                                <div class="border d-flex justify-content-center align-items-center p-5 mb-3">
+                                    <div class="text-center drag-and-drop-area" id="pathToBitmask">
+                                        <p>Drag & Drop or
+                                            <button>browse</button>
+                                            a TXT-File as Bitmask
+                                        </p>
+                                        <small>Supports: txt</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <input class="form-check-input" id="cleanup" type="checkbox">
+                                <label class="form-check-label" for="cleanup">
+                                    Keep pictures without metadata
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+</body>
 </html>

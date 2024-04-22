@@ -12,14 +12,11 @@ h4, h1 {
     text-align: center;
 }
 
-.container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    padding-top: 10vh;
+h4 {
+    padding-bottom: 15px;
 }
 
+/* Main Container*/
 .boxcontainer {
     display: flex;
     flex-direction: column;
@@ -28,11 +25,35 @@ h4, h1 {
     margin: 25px 50px;
     padding: 25px 10px;
     background: #FAF9F6;
-    border-radius: 5px;
-    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+    color: #333;
+    border-radius: 10px;
 }
+
+.container {
+    padding: 25px;
+    margin: inherit;
+}
+
 
 .drag-and-drop-area {
+    border: 3px dashed rgba(42, 4, 74, 0.4);
+    border-radius: 5px;
+    cursor: pointer;
 
 }
+
+/* BTN Styling*/
+
+.btn-style {
+    background-color: #2A044A;
+    border: #2A044A;
+    align-content: center;
+}
+
+.btn-style:hover {
+    background-color: #a0c55f;
+    border: #a0c55f;
+}
+
 
